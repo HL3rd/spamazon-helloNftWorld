@@ -5,6 +5,8 @@ import NFTContainer from './NFTContainer';
 
 const Checkout:React.FC = () => {
 
+  // NOTE: THIS IS THE TEST WALLET ADDRESS FROM THIS DOCUMENTATION:
+  // https://api.rarible.org/v0.1/doc#operation/getItemsByOwner
   const testWalletAddress = "0x60f80121c31a0d46b5279700f9df786054aa5ee5"
 
   const [errorMessage, setErrorMessage] = useState('');
