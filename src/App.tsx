@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import Home from './Home';
 import Checkout from './Checkout';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import './App.css';
 
