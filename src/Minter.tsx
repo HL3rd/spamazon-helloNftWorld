@@ -3,8 +3,6 @@ import { connectWallet, getCurrentWalletConnected, mintNFT } from './utils/inter
 
 const Minter:React.FC<any> = (props:any) => {
 
-  var window: any; 
-
   //State variables
   const [walletAddress, setWallet] = useState("");
   const [status, setStatus] = useState<any>(null);
@@ -17,8 +15,8 @@ const Minter:React.FC<any> = (props:any) => {
   },);
 
   function addWalletListener() {
-    if (window.ethereum) {
-      window.ethereum.on("accountsChanged", (accounts:any) => {
+    if ((window as any).ethereum) {
+      (window as any).ethereum.on("accountsChanged", (accounts:any) => {
         if (accounts.length > 0) {
           setWallet(accounts[0]);
           setStatus("👆🏽 Write a message in the text-field above.");

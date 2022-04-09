@@ -4,12 +4,15 @@ require('dotenv').config();
 const alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
 const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const web3 = createAlchemyWeb3(alchemyKey);
+
 declare var window: any;
 
 const contractABI = require('../contract-abi.json');
-const contractAddress = "0x08207fE7F1f7C9f1c39e4720b9F7Bfe2AfD01907"
+const nftMinterContractAddress = "0x08207fE7F1f7C9f1c39e4720b9F7Bfe2AfD01907"
 
 export const mintNFT = async (url:string, name:string, description:string) => {
+
+  console.log(`mintNFT tapped`);
 
   //error handling
   if (url.trim() === "" || (name.trim() === "" || description.trim() === "")) { 
@@ -36,10 +39,10 @@ export const mintNFT = async (url:string, name:string, description:string) => {
   } 
   const tokenURI = pinataResponse.pinataUrl;
 
-  window.contract = await new web3.eth.Contract(contractABI, contractAddress);
+  window.contract = await new web3.eth.Contract(contractABI, nftMinterContractAddress);
 
   const transactionParameters = {
-    to: contractAddress,    // Required except during contract publications.
+    to: nftMinterContractAddress,    // Required except during contract publications.
     from: window.ethereum.selectedAddress,    // must match user's active address.
     'data': window.contract.methods.mintNFT(window.ethereum.selectedAddress, tokenURI).encodeABI() // make call to NFT smart contract
   }
@@ -53,7 +56,7 @@ export const mintNFT = async (url:string, name:string, description:string) => {
         });
     return {
         success: true,
-        status: "✅ Check out your transaction on Etherscan: https://ropsten.etherscan.io/tx/" + txHash
+        status: "✅ Check out your transaction on Etherscan: https://rinkeby.etherscan.io/tx/" + txHash
     }
   } catch (error:any) {
     return {
