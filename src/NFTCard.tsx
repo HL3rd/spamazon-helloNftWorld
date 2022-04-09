@@ -8,12 +8,12 @@ const NFTCard:React.FC<NFTCardProps> = ({ nft }) => {
 
   return (
     <div>
-      <img alt="nft-img" src={nft.meta.content[1].url} />
+      <img alt="nft-img" src={nft.image_url} />
       <p>ID: {nft.id}</p>
-      <p>Collection: {nft.collection}</p>
-      <p>Contract: {nft.contract}</p>
-      <p>Name: {nft.meta.name}</p>
-      <p>{nft.meta.description}</p>
+      <p>Collection: {nft.collection.slug}</p>
+      <p>Contract: {nft.asset_contract.address}</p>
+      <p>Name: {nft.name}</p>
+      <p>{nft.description}</p>
     </div>
   )
 }
