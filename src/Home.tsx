@@ -1,11 +1,16 @@
 import React from 'react';
+import './Home.css'
 
 const Home = () => {
   return (
-    <div>
-      <h1>Welcome home</h1>
-      <p><a href="/checkout">Click here to view our product</a></p>
-    </div>
+    <body>
+      <h1 className="title-home">SPAMAZON</h1>
+      <div className="container">
+        <h2 className="title-h1">Welcome home</h2>
+        <p><a href="/checkout">Click here to view our product</a></p>
+      </div>
+    </body>
+    
   );
 }
 

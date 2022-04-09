@@ -5,11 +5,15 @@ const Checkout = () => {
 
 
   return (
-    <div>
-      <h1>Checkout product</h1>
-      <p className="main-p">Hello world!</p>
-      <button>One-click barter</button>
-    </div>
+    <body>
+      <h1><a className="return-home" href="/">SPAMAZON</a></h1>
+      <div className="container">
+        <h2>Checkout product</h2>
+        <p className="main-p">Hello world!</p>
+        <button>One-click barter</button>
+      </div>
+    </body>
+    
   );
 }
 

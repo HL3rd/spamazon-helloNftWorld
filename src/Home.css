@@ -1,0 +1,12 @@
+/* Specific css to home page */
+.title-home {
+    text-align: center;
+    font-size: 3.5em;
+}
+
+.return-home,
+.return-home:hover {
+    color: rgb(14, 15, 15);
+}
+
+
