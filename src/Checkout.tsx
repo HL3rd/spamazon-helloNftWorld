@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
 
+import { connectWallet } from './utils/interact';
+
 import NFTContainer from './NFTContainer';
 
 const Checkout:React.FC = () => {
+
+  var window: any;
 
   // NOTE: THIS IS THE TEST WALLET ADDRESS FROM THIS DOCUMENTATION:
   // https://api.rarible.org/v0.1/doc#operation/getItemsByOwner
@@ -14,14 +18,15 @@ const Checkout:React.FC = () => {
   const [userBalance, setUserBalance] = useState('');
   const [nfts, setNfts] = useState([]);
 
-  const connectWallet = () => {
-    if ((window as any).ethereum) {
-      (window as any).ethereum.request({ method: 'eth_requestAccounts'})
-        .then((accounts:any) => {
-          accountChangedHandler(accounts[0]);
-        })
+  const connectWaletCheckout = async () => {
+
+    const resp:any = await connectWallet();
+    const addr = resp.address;
+
+    if (addr !== "") {
+      accountChangedHandler(addr);
     } else {
-      setErrorMessage('Please install Metamask');
+      setErrorMessage(resp.status)
     }
   }
 
@@ -32,7 +37,7 @@ const Checkout:React.FC = () => {
   }
 
   const getUserBalance = (address:any) => {
-    (window as any).ethereum.request({method: 'eth_getBalance', params: [address, 'latest']})
+    window.ethereum.request({method: 'eth_getBalance', params: [address, 'latest']})
       .then((balance:any) => {
           setUserBalance(ethers.utils.formatEther(balance));
       })
@@ -52,21 +57,25 @@ const Checkout:React.FC = () => {
   }
 
   // Check if user changes their connected account
-  (window as any).ethereum.on('accountChanged', accountChangedHandler);
+  window.ethereum.on('accountChanged', accountChangedHandler);
 
   // If user changes testnets or test to devnet, reload site
-  (window as any).ethereum.on('chainChanged', chainChangedHandler);
+  window.ethereum.on('chainChanged', chainChangedHandler);
 
   return (
     <div>
       <h1>Checkout product</h1>
-      <button onClick={connectWallet}>One-click barter</button>
+      <button onClick={connectWaletCheckout}>One-click barter</button>
       <div>
         <h3>Address: {walletAddress}</h3>
       </div>
       <div>
         <h3>Balance: { userBalance }</h3>
         <p>{errorMessage}</p>
+      </div>
+      <div>
+        <h2>Ayo? Tryna Mint?</h2>
+        <p><a href="/minter">Minter</a></p>
       </div>
       <NFTContainer nfts={nfts} />
     </div>
