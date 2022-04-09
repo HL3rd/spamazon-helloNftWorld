@@ -10,7 +10,6 @@ const Checkout:React.FC = () => {
   // NOTE: THIS IS THE TEST WALLET ADDRESS FROM THIS DOCUMENTATION:
   // https://api.rarible.org/v0.1/doc#operation/getItemsByOwner
   const testWalletAddress = "0x60f80121c31a0d46b5279700f9df786054aa5ee5"
-  const testWalletAddress2 = "0x08207fE7F1f7C9f1c39e4720b9F7Bfe2AfD01907"
 
   const [errorMessage, setErrorMessage] = useState('');
   const [walletAddress, setWalletAddress] = useState(null);
@@ -54,7 +53,7 @@ const Checkout:React.FC = () => {
     };
     
     
-    const response = await fetch('https://rinkeby-api.opensea.io/api/v1/assets?owner=0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6&order_direction=desc&offset=0&limit=20', options);
+    const response = await fetch(`https://rinkeby-api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=0&limit=20`, options);
     const data = await response.json();
 
     console.log(`address param: ${address}, data: ${JSON.stringify(data)}`);
