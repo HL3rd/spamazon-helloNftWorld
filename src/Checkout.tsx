@@ -46,7 +46,7 @@ const Checkout:React.FC = () => {
     // TODO: Use this for production/mainnet API
     // const options = {
     //   method: 'GET',
-    //   headers: {Accept: 'application/json', 'X-API-KEY': '4241762ffea6446e8c2ee20a624db229'},
+    //   headers: {Accept: 'application/json', 'X-API-KEY': ''},
     // };
     const options = {
       method: 'GET',
