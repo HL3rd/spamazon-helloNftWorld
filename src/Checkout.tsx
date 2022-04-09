@@ -7,11 +7,10 @@ import NFTContainer from './NFTContainer';
 
 const Checkout:React.FC = () => {
 
-  var window: any;
-
   // NOTE: THIS IS THE TEST WALLET ADDRESS FROM THIS DOCUMENTATION:
   // https://api.rarible.org/v0.1/doc#operation/getItemsByOwner
   const testWalletAddress = "0x60f80121c31a0d46b5279700f9df786054aa5ee5"
+  const testWalletAddress2 = "0x08207fE7F1f7C9f1c39e4720b9F7Bfe2AfD01907"
 
   const [errorMessage, setErrorMessage] = useState('');
   const [walletAddress, setWalletAddress] = useState(null);
@@ -37,7 +36,7 @@ const Checkout:React.FC = () => {
   }
 
   const getUserBalance = (address:any) => {
-    window.ethereum.request({method: 'eth_getBalance', params: [address, 'latest']})
+    (window as any).ethereum.request({method: 'eth_getBalance', params: [address, 'latest']})
       .then((balance:any) => {
           setUserBalance(ethers.utils.formatEther(balance));
       })
@@ -45,11 +44,25 @@ const Checkout:React.FC = () => {
 
   const getNFTData = async(address:any) => {
 
-    const response = await fetch(`https://api.rarible.org/v0.1/items/byOwner/?owner=ETHEREUM:${testWalletAddress}`);
-
+    // const options = {
+    //   method: 'GET',
+    //   headers: {Accept: 'application/json', 'X-API-KEY': '4241762ffea6446e8c2ee20a624db229'},
+    // };
+    const options = {
+      method: 'GET',
+    };
+    
+    
+    const response = await fetch('https://rinkeby-api.opensea.io/api/v1/assets?owner=0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6&order_direction=desc&offset=0&limit=20', options);
     const data = await response.json();
 
-    setNfts(data.items);
+    console.log(`address param: ${address}, data: ${JSON.stringify(data)}`);
+
+    if (data === undefined || data === null) {
+      setErrorMessage(`NFTs not found`);
+    } else {
+      setNfts(data.assets);
+    }
   }
 
   const chainChangedHandler = (newChain:any) => {
@@ -57,10 +70,10 @@ const Checkout:React.FC = () => {
   }
 
   // Check if user changes their connected account
-  window.ethereum.on('accountChanged', accountChangedHandler);
+  (window as any).ethereum.on('accountChanged', accountChangedHandler);
 
   // If user changes testnets or test to devnet, reload site
-  window.ethereum.on('chainChanged', chainChangedHandler);
+  (window as any).ethereum.on('chainChanged', chainChangedHandler);
 
   return (
     <div>
