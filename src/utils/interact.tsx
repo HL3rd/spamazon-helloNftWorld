@@ -1,4 +1,68 @@
+import { pinJSONToIPFS } from './pinata';
+
+require('dotenv').config();
+const alchemyKey = process.env.REACT_APP_ALCHEMY_KEY;
+const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+const web3 = createAlchemyWeb3(alchemyKey);
 declare var window: any;
+
+const contractABI = require('../contract-abi.json');
+const contractAddress = "0x08207fE7F1f7C9f1c39e4720b9F7Bfe2AfD01907"
+
+export const mintNFT = async (url:string, name:string, description:string) => {
+
+  //error handling
+  if (url.trim() === "" || (name.trim() === "" || description.trim() === "")) { 
+    return {
+      success: false,
+      status: "❗Please make sure all fields are completed before minting.",
+    }
+  }
+
+  // make metadata
+  /* eslint-disable */
+  const metadata:any = new Object();
+  metadata.name = name;
+  metadata.image = url;
+  metadata.description = description;
+
+  //make pinata call
+  const pinataResponse = await pinJSONToIPFS(metadata);
+  if (!pinataResponse.success) {
+      return {
+          success: false,
+          status: "😢 Something went wrong while uploading your tokenURI.",
+      }
+  } 
+  const tokenURI = pinataResponse.pinataUrl;
+
+  window.contract = await new web3.eth.Contract(contractABI, contractAddress);
+
+  const transactionParameters = {
+    to: contractAddress,    // Required except during contract publications.
+    from: window.ethereum.selectedAddress,    // must match user's active address.
+    'data': window.contract.methods.mintNFT(window.ethereum.selectedAddress, tokenURI).encodeABI() // make call to NFT smart contract
+  }
+
+  try {
+    // Make the await call where we ask Metamask to sign the txn
+    const txHash = await window.ethereum
+        .request({
+          method: 'eth_sendTransaction',
+          params: [transactionParameters],
+        });
+    return {
+        success: true,
+        status: "✅ Check out your transaction on Etherscan: https://ropsten.etherscan.io/tx/" + txHash
+    }
+  } catch (error:any) {
+    return {
+      success: false,
+      status: "😥 Something went wrong: " + error.message
+    }
+  }
+
+}
 
 export const connectWallet = async () => {
   if (window.ethereum) {
