@@ -2,6 +2,7 @@
 
 body {
   color: rgb(14, 15, 15);
+  /* background-image: url("./assets/Shark.gif"); */
   background: linear-gradient(to right, rgb(54, 209, 220), rgb(91, 134, 229));
   font-family: 'Lato', sans-serif;
   margin: 0;
