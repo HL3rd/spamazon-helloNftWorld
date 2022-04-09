@@ -44,6 +44,7 @@ const Checkout:React.FC = () => {
 
   const getNFTData = async(address:any) => {
 
+    // TODO: Use this for production/mainnet API
     // const options = {
     //   method: 'GET',
     //   headers: {Accept: 'application/json', 'X-API-KEY': '4241762ffea6446e8c2ee20a624db229'},
