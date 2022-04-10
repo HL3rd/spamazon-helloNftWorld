@@ -5,7 +5,7 @@
  * them again here.
  */
 
-const { ethers } = require("hardhat");
+const { ethers } = require('hardhat');
 
 async function main() {
   // Grab the contract factory 

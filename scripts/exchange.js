@@ -1,3 +1,4 @@
+require('dotenv').config();
 const ALCHEMY_KEY = process.env.REACT_APP_ALCHEMY_KEY;
 const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY;
 
@@ -6,6 +7,7 @@ const { ethers } = require('hardhat');
 // Barter.sol Contract setup
 const BARTER_CONTRACT_ADDRESS = "0xF908424ee606CCcF49d71a87Ab7AB874a39e9CbD";
 const contract = require('../artifacts/contracts/Barter.sol/Barter.json');
+const IERC721Contract = require('../artifacts/@openzeppelin/contracts/token/ERC721/IERC721.sol/IERC721.json');
 
 // Provider
 const alchemyProvider = new ethers.providers.AlchemyProvider(network="rinkeby", ALCHEMY_KEY);
@@ -36,14 +38,19 @@ async function main() {
 
   const testBuyerAddr = "0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6";
   const testSellerAddr = "0x6E9190A074371C3A1b96120D2b1A3834D9d51F64";
-  const testContractAddr = "0x08207fe7f1f7c9f1c39e4720b9f7bfe2afd01907";
-  const testTokenId = "1"; // Life is good
+  const testNftContractAddr = "0x08207fe7f1f7c9f1c39e4720b9f7bfe2afd01907";
+  const testTokenId = 1; // Life is good
 
+  // Approve trade before attempting exchange
+  const ierc721Abi = IERC721Contract.abi;
+  const ierc721Interface = new ethers.utils.Interface(ierc721Abi);
+  // const ierc721Contract = new ethers.Contract(testNftContractAddr, ierc721Abi, signer);
+  await ierc721Interface.functions.approve(testSellerAddr, testTokenId, {from: testBuyerAddr});
   
-  console.log(`Sending NFT: ${testContractAddr}, id ${testTokenId} over to ${testSellerAddr}`);
-  const tx = await barterContract.exchangeNFT(testBuyerAddr, testSellerAddr, testContractAddr, testTokenId, {gasLimit: 5000000});
+  console.log(`Sending NFT: ${testNftContractAddr}, id ${testTokenId} over to ${testSellerAddr}`);
+  const tx = await barterContract.exchangeNFT(testBuyerAddr, testSellerAddr, testNftContractAddr, testTokenId, {from: testBuyerAddr, gasLimit: 5000000});
   await tx.wait();
-  console.log(`Should now check ${testSellerAddr} to see if NFT ${testContractAddr} with tokenId ${testTokenId} transferred`); 
+  console.log(`Should now check ${testSellerAddr} to see if NFT ${testNftContractAddr} with tokenId ${testTokenId} transferred`); 
 
 }
 
