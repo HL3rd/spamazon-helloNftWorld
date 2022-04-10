@@ -44,8 +44,10 @@ async function main() {
   // Approve trade before attempting exchange
   const ierc721Abi = IERC721Contract.abi;
   const ierc721Interface = new ethers.utils.Interface(ierc721Abi);
-  // const ierc721Contract = new ethers.Contract(testNftContractAddr, ierc721Abi, signer);
-  await ierc721Interface.functions.approve(testSellerAddr, testTokenId, {from: testBuyerAddr});
+  const ierc721Contract = new ethers.Contract(testNftContractAddr, ierc721Abi, signer);
+
+  const firsty = await ierc721Contract.approve(BARTER_CONTRACT_ADDRESS, testTokenId, {from: testBuyerAddr});
+  console.log(`Go this first approval transaction: ${JSON.stringify(firsty)}`);
   
   console.log(`Sending NFT: ${testNftContractAddr}, id ${testTokenId} over to ${testSellerAddr}`);
   const tx = await barterContract.exchangeNFT(testBuyerAddr, testSellerAddr, testNftContractAddr, testTokenId, {from: testBuyerAddr, gasLimit: 5000000});
