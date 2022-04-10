@@ -12,18 +12,6 @@ account2 = get_account(2)
 nft_address = '0x3F029AB70b36848e7D9b615FE70de3367dBF8821'
 tokenID = 0
 
-
-
-    # print(interface.ERC20('0xc778417E063141139Fce010982780140Aa0cD5Ab').balanceOf(accountPublic1))
-    # NFT = interface.IERC721('0x958ba3A9cC45A01A5C1D58831E6F6421C8b9640D')
-    # print(NFT.balanceOf(accountPublic1))
-    # print(NFT.ownerOf(0))
-
-
-
-#IERC721().approve(address, tokenID)
-
-
 def interact():
         swap = Barter[-1]
         weth_addr = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
