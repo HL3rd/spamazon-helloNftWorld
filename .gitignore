@@ -4,6 +4,10 @@
 /node_modules
 /.pnp
 .pnp.js
+.history
+.hypothesis/
+tests/
+reports/
 
 # testing
 /coverage
