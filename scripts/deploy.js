@@ -1,4 +1,11 @@
-const { ethers } = require("hardhat");
+/**
+ * NOTE: MyNFT was a test contract that was deployed to create NFT test data
+ * The deployments for Math.sol and Barter.sol were done in another project.
+ * Since the contracts are already deployed on Rinkeby, there was no need to deploy
+ * them again here.
+ */
+
+const { ethers } = require('hardhat');
 
 async function main() {
   // Grab the contract factory 
