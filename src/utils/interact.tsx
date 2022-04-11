@@ -1,18 +1,30 @@
 import { pinJSONToIPFS } from './pinata';
+import { ethers } from 'ethers';
 
 require('dotenv').config();
+
+const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY;
+
 const alchemyKey = process.env.REACT_APP_ALCHEMY_URL;
 const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const web3 = createAlchemyWeb3(alchemyKey);
 
+
 declare var window: any;
 
-const contractABI = require('../contract-abi.json');
-const nftMinterContractAddress = "0x08207fE7F1f7C9f1c39e4720b9F7Bfe2AfD01907"
+// MintNft.sol Contract info
+const mintNftABI = require('../artifacts/contract-abi.json');
+const nftMinterContractAddress = "0x08207fE7F1f7C9f1c39e4720b9F7Bfe2AfD01907";
+
+// Barter.sol Contract info
+const BARTER_CONTRACT_ADDRESS = "0xF908424ee606CCcF49d71a87Ab7AB874a39e9CbD";
+const barterContractInfo = require('../artifacts/Barter.json');
+const IERC721ContractInfo = require('../artifacts/IERC721.json');
+
+// TODO: Change to something else in the future
+const STORE_WALLET_ADDRESS = "0x2929C3c9805dD1A16546251b9b0B65583FD302c8"
 
 export const mintNFT = async (url:string, name:string, description:string) => {
-
-  console.log(`mintNFT tapped`);
 
   //error handling
   if (url.trim() === "" || (name.trim() === "" || description.trim() === "")) { 
@@ -39,7 +51,7 @@ export const mintNFT = async (url:string, name:string, description:string) => {
   } 
   const tokenURI = pinataResponse.pinataUrl;
 
-  window.contract = await new web3.eth.Contract(contractABI, nftMinterContractAddress);
+  window.contract = await new web3.eth.Contract(mintNftABI, nftMinterContractAddress);
 
   const transactionParameters = {
     to: nftMinterContractAddress,    // Required except during contract publications.
@@ -65,6 +77,46 @@ export const mintNFT = async (url:string, name:string, description:string) => {
     }
   }
 
+}
+
+/**
+ * 
+ * @param nft 
+ * @returns 
+ * 
+ * Function triggers transfer of NFT from buyer wallet to store wallet
+ * 
+ */
+export const transferNft = async (nft:any) => {
+
+  const buyerAddr = window.ethereum.selectedAddress;
+
+  if (!buyerAddr) { console.log(`Error, no selected wallet address`); return; }
+
+  // Provider
+  // @ts-ignore
+  const alchemyProvider = new ethers.providers.AlchemyProvider(network="rinkeby", ALCHEMY_KEY);
+  // Signer
+  const signer = window.ethereum.selectedAddress;
+
+  // contract instance
+  const barterContract = new ethers.Contract(BARTER_CONTRACT_ADDRESS, barterContractInfo.abi, signer);
+
+  const nftContractAddr = nft.asset_contract.address; // NFT contract address
+  const nftTokenId = nft.token_id; // NFT token id
+  const selletAddr = STORE_WALLET_ADDRESS; // receives the NFT token
+
+  // Approve trade before attempting exchange using OpenZeppelin
+  // OpenZeppelin IERC721 functions are embedded in NFT contract so the ABI is functional
+  const ierc721Abi = IERC721ContractInfo.abi;
+  const ierc721Contract = new ethers.Contract(nftContractAddr, ierc721Abi, signer);
+  const tx_1 = await ierc721Contract.approve(BARTER_CONTRACT_ADDRESS, nftTokenId);
+  console.log(`approve transaction: ${tx_1.hash}`);
+  
+  // Barter.sol, now approved, trigger the NFT exchange
+  const tx_2 = await barterContract.exchangeNFT(buyerAddr, selletAddr, nftContractAddr, nftTokenId, {from: buyerAddr, gasLimit: 5000000});
+  console.log(`exchangeNFT transaction: ${tx_2.hash}`);
+  console.log(`Should now check ${selletAddr} to see if NFT ${nftContractAddr} with tokenId ${nftTokenId} transferred`); 
 }
 
 export const connectWallet = async () => {

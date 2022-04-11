@@ -52,7 +52,6 @@ const Checkout:React.FC = () => {
       method: 'GET',
     };
     
-    
     const response = await fetch(`https://rinkeby-api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=0&limit=20`, options);
     const data = await response.json();
 
