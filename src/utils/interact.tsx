@@ -9,7 +9,6 @@ const alchemyKey = process.env.REACT_APP_ALCHEMY_URL;
 const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const web3 = createAlchemyWeb3(alchemyKey);
 
-
 declare var window: any;
 
 // MintNft.sol Contract info

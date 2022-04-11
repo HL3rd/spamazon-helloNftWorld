@@ -5,7 +5,19 @@ import { connectWallet } from './utils/interact';
 
 import NFTContainer from './NFTContainer';
 
+import { Product, ProductOrder } from './constants/class-objects';
+
 const Checkout:React.FC = () => {
+
+  const testProduct:Product = {
+    description: 'A new revolutionary product',
+    productImageUrls: ['https://images-na.ssl-images-amazon.com/images/I/91TvWl33h4L.jpg'],
+    id: '00000',
+    isListed: true,
+    name: 'Guide to the Universe Book',
+    price: 10000,
+    quantity: 100,
+  }
 
   // NOTE: THIS IS THE TEST WALLET ADDRESS FROM THIS DOCUMENTATION:
   // https://api.rarible.org/v0.1/doc#operation/getItemsByOwner
@@ -75,19 +87,26 @@ const Checkout:React.FC = () => {
   return (
     <div>
       <h1>Checkout product</h1>
+      <img alt="product-img" width="20%" src={testProduct.productImageUrls[0]} />
+      <h2>{testProduct.name}</h2>
+      <p>{testProduct.description}</p>
+      <p>{testProduct.price}</p>
       <button onClick={connectWalletCheckout}>One-click barter</button>
       <div>
-        <h3>Address: {walletAddress}</h3>
+        <p>Address: {walletAddress}</p>
       </div>
       <div>
-        <h3>Balance: { userBalance }</h3>
+        <p>Balance: { userBalance }</p>
         <p>{errorMessage}</p>
       </div>
       <div>
         <h2>Ayo? Tryna Mint?</h2>
-        <p><a href="/minter">Minter</a></p>
+        <h3><a href="/minter">Minter</a></h3>
       </div>
-      <NFTContainer nfts={nfts} />
+      <div>
+        <h2>Your NFTs</h2>
+        <NFTContainer nfts={nfts} />
+      </div>
     </div>
   );
 }
