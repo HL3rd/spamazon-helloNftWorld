@@ -16,7 +16,7 @@ const Checkout:React.FC = () => {
   const [userBalance, setUserBalance] = useState('');
   const [nfts, setNfts] = useState([]);
 
-  const connectWaletCheckout = async () => {
+  const connectWalletCheckout = async () => {
 
     const resp:any = await connectWallet();
     const addr = resp.address;
@@ -55,8 +55,6 @@ const Checkout:React.FC = () => {
     const response = await fetch(`https://rinkeby-api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=0&limit=20`, options);
     const data = await response.json();
 
-    console.log(`address param: ${address}, data: ${JSON.stringify(data)}`);
-
     if (data === undefined || data === null) {
       setErrorMessage(`NFTs not found`);
     } else {
@@ -77,7 +75,7 @@ const Checkout:React.FC = () => {
   return (
     <div>
       <h1>Checkout product</h1>
-      <button onClick={connectWaletCheckout}>One-click barter</button>
+      <button onClick={connectWalletCheckout}>One-click barter</button>
       <div>
         <h3>Address: {walletAddress}</h3>
       </div>

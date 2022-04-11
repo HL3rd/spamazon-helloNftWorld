@@ -95,9 +95,13 @@ export const transferNft = async (nft:any) => {
 
   // Provider
   // @ts-ignore
-  const alchemyProvider = new ethers.providers.AlchemyProvider(network="rinkeby", ALCHEMY_KEY);
+  // const alchemyProvider = new ethers.providers.AlchemyProvider(network="rinkeby", ALCHEMY_KEY);
   // Signer
-  const signer = window.ethereum.selectedAddress;
+  // const signer = new ethers.Wallet(PRIVATE_KEY, alchemyProvider);
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  const signer = provider.getSigner();
 
   // contract instance
   const barterContract = new ethers.Contract(BARTER_CONTRACT_ADDRESS, barterContractInfo.abi, signer);
