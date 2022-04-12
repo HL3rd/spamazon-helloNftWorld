@@ -1,11 +1,25 @@
-import React from 'react';
-import { transferNft } from './utils/productInteractions';
+import React, { useState } from 'react';
+import { Product } from './constants/class-objects';
+import { canPurchaseCheck, transferNft } from './utils/productInteractions';
 
 interface NFTCardProps {
-  nft: any
+  nft: any,
+  product: Product,
+  ethPrice: any
 }
 
-const NFTCard:React.FC<NFTCardProps> = ({ nft }) => {
+const NFTCard:React.FC<NFTCardProps> = ({ nft, product, ethPrice }) => {
+
+  const [status, setStatus] = useState("");
+
+  const executeInstantBarter = async (nft:any, product:Product, ethPrice:any) => {
+    const checkResp = await canPurchaseCheck(nft, product, ethPrice);
+    setStatus(checkResp.status);
+    if (checkResp.success) {
+      const transferResp = await transferNft(nft);
+      setStatus(transferResp.status);
+    }
+  };
 
   return (
     <div style={{ backgroundColor: "white", borderRadius: "20px", width: "50%", padding: "10px", margin: "0px auto 15px auto" }}>
@@ -14,7 +28,8 @@ const NFTCard:React.FC<NFTCardProps> = ({ nft }) => {
       <p>Contract: {nft.asset_contract.address}, tokenId: {nft.token_id}</p>
       <p>Name: {nft.name}</p>
       <p>{nft.description}</p>
-      <button onClick={() => transferNft(nft)}>Barter Me</button>
+      <button onClick={() => executeInstantBarter(nft, product, ethPrice)}>Barter Me</button>
+      <p>{status}</p>
     </div>
   )
 }
