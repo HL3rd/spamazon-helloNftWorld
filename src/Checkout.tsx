@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ethers } from 'ethers';
 
 import { connectWallet } from './utils/interact';
+import { ethPriceInUSD } from './utils/productInteractions';
 
 import NFTContainer from './NFTContainer';
 
@@ -91,7 +92,7 @@ const Checkout:React.FC = () => {
       <h2>{testProduct.name}</h2>
       <p>{testProduct.description}</p>
       <p>{testProduct.price}</p>
-      <button onClick={connectWalletCheckout}>One-click barter</button>
+      <button onClick={connectWalletCheckout}>Connect Wallet</button>
       <div>
         <p>Address: {walletAddress}</p>
       </div>
