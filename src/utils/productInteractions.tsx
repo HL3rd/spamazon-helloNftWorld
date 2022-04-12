@@ -9,6 +9,11 @@ const STORE_WALLET_ADDRESS = "0x2929C3c9805dD1A16546251b9b0B65583FD302c8"
 
 declare var window: any;
 
+/**
+ * 
+ * @returns ETH price in USD
+ * 
+ */
 export const getETHPriceInUSD = async () => {
   const options = {
     method: 'GET',
@@ -18,6 +23,15 @@ export const getETHPriceInUSD = async () => {
   return data.USD;
 }
 
+/**
+ * 
+ * @param nft 
+ * @returns 
+ * 
+ * Calls the OpenSea API to retrieve NFT collection slug
+ * Then calls ethe OpenSea API with the slug to collect floor_price
+ * 
+ */
 const openSeaCollectionFloorPrice = async (nft:any) => {
   const options = {
     method: 'GET'
@@ -42,6 +56,17 @@ const openSeaCollectionFloorPrice = async (nft:any) => {
   return floorPrice;
 }
 
+/**
+ * 
+ * @param nft 
+ * @param product 
+ * @param ethPrice 
+ * @returns 
+ * 
+ * Based on floor price of NFT collection in USD compared to the product price,
+ * function will return success or failure if an instant purchase can take place
+ * 
+ */
 export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) => {
   
   console.log(`FINAL ETH PRICE AT PURCASE CHECK : ${ethPrice}`);
