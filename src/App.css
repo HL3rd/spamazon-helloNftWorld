@@ -291,7 +291,9 @@ a:hover {
 .nft-content {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-evenly;
+  max-height: 80vh;
+  overflow: scroll;
 }
 
 

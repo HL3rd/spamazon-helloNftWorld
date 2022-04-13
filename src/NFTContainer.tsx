@@ -11,7 +11,7 @@ interface NFTContainerProps {
 const NFTContainer:React.FC<NFTContainerProps> = ({ nfts, product, ethPrice }) => {
 
   return (
-    <div>
+    <div className="nft-content">
       { nfts.map((nft:any, index:any) => {
         return <NFTCard nft={nft} product={product} ethPrice={ethPrice} key={index} />
       })}
