@@ -42,12 +42,10 @@ async function main() {
     testNftContractAddr,
     testTokenId,
     testPaymentValueWei,
-    {
-      from: testBuyerAddr,
-      gasLimit: 9000000
-    });
+    { from: testBuyerAddr, gasLimit: 9000000 }
+  );
   console.log(`repay transaction hash: ${tx_2.hash}`);
-  console.log(`Buyer ${testBuyerAddr} paid ${testItemValueETH / testPayCount}ETH \n to ${testSellerAddr} via contract ${BARTER_CONTRACT_ADDRESS}`); 
+  console.log(`Buyer ${testBuyerAddr} paid ${testItemValueETH / testPayCount} ETH \n to ${testSellerAddr} via contract ${BARTER_CONTRACT_ADDRESS}`); 
 }
 
 main()
