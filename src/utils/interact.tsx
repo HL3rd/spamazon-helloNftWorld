@@ -8,7 +8,7 @@ const web3 = createAlchemyWeb3(alchemyKey);
 
 // MintNft.sol Contract info
 const mintNftABI = require('../artifacts/contract-abi.json');
-const nftMinterContractAddress = "0x08207fE7F1f7C9f1c39e4720b9F7Bfe2AfD01907";
+const nftMinterContractAddress = "0x1B90d069Cda761e669d8270a0fb4e01075D7b8A2"; //"0x08207fE7F1f7C9f1c39e4720b9F7Bfe2AfD01907";
 
 declare var window: any;
 
@@ -41,6 +41,9 @@ export const mintNFT = async (url:string, name:string, description:string) => {
 
   window.contract = await new web3.eth.Contract(mintNftABI, nftMinterContractAddress);
 
+  console.log(`NFT Minter Address: ${nftMinterContractAddress}`)
+  console.log(`Seleceted Address: ${window.ethereum.selectedAddress}`)
+  
   const transactionParameters = {
     to: nftMinterContractAddress,    // Required except during contract publications.
     from: window.ethereum.selectedAddress,    // must match user's active address.

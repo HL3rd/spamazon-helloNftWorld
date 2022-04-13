@@ -13,7 +13,7 @@ const Checkout:React.FC = () => {
 
   const testProduct:Product = {
     description: 'A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product',
-    productImageUrls: ['https://images-na.ssl-images-amazon.com/images/I/91TvWl33h4L.jpg', "https://i.kym-cdn.com/entries/icons/mobile/000/006/026/NOTSUREIF.jpg", "https://i.kym-cdn.com/entries/icons/mobile/000/006/026/NOTSUREIF.jpg"],
+    productImageUrls: ['https://images-na.ssl-images-amazon.com/images/I/91TvWl33h4L.jpg', "https://i.kym-cdn.com/entries/icons/mobile/000/006/026/NOTSUREIF.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Giraffa_camelopardalis_angolensis.jpg/1024px-Giraffa_camelopardalis_angolensis.jpg"],
     id: '00000',
     isListed: true,
     name: 'Guide to the Universe Book',
@@ -26,8 +26,15 @@ const Checkout:React.FC = () => {
   const [userBalance, setUserBalance] = useState('');
   const [nfts, setNfts] = useState([]);
   const [ethPrice, setETHPrice] = useState();
+  const [currentImage, setCurrentImage] = useState(testProduct.productImageUrls[0]);
 
   const connectWalletCheckout = async () => {
+
+    document.getElementById('overlay')!.style.opacity = "1"; // added for overlay
+    document.getElementById('overlay')!.style.height = "80vh";
+    document.getElementById('overlay')!.style.width = "100%";
+    let myContainer = document.getElementById('switching-title') as HTMLInputElement;
+    myContainer.innerHTML = "Your NFTs";
 
     const resp:any = await connectWallet();
     const addr = resp.address;
@@ -89,63 +96,69 @@ const Checkout:React.FC = () => {
     setETHPrice(price);
   };
 
+  const imageClick = (clickedUrl:string) => {
+    setCurrentImage(clickedUrl);
+  };
+
   useEffect(() => {
     callEthPriceCheck();
   }, []);
 
   return (
     <body>
-      <div className="top">
-        <a href="/">
-          <div>
-            <h1 className="brand">SPAMAZON</h1>
-          </div>
-        </a>
+      <div className="whole-top">
+        <div className="top">
+          <a href="/">
+            <div>
+              <h1 className="brand">SPAMAZON</h1>
+            </div>
+          </a>
 
-        <div className="user-info">
-          <p>Wallet Address: {walletAddress}</p>
-          <p>Wallet Balance: {userBalance}</p>
-          <p>{errorMessage}</p>
+          <div className="user-info">
+            <p>Wallet Address: {walletAddress}</p>
+            <p>Wallet Balance: {userBalance}</p>
+            <p>{errorMessage}</p>
+          </div>
+
+          <a href="/checkout">
+            <div>
+              <h2 className="checkout">Checkout</h2>
+            </div>
+          </a>
         </div>
 
-        <a href="/checkout">
-          <div>
-            <h2 className="checkout">Checkout</h2>
-          </div>
-        </a>
-      </div>
+        <div className="second-top">
+          <h3>Spam</h3>
+          <h3>Spam</h3>
+          <h3>Spam</h3>
+          <h3>Spam</h3>
+          <h3>Spam</h3>
+          <h3>Spam</h3>
+          <h3>Spam</h3>
+          <h3>Spam</h3>
+          <h3>Spam</h3>
+          <h3>Spam</h3>
+          <h3>Spam</h3>
+          <h3>Spam</h3>
+          <h3>Spam</h3>
+        </div>
 
-      <div className="second-top">
-        <h3>Spam</h3>
-        <h3>Spam</h3>
-        <h3>Spam</h3>
-        <h3>Spam</h3>
-        <h3>Spam</h3>
-        <h3>Spam</h3>
-        <h3>Spam</h3>
-        <h3>Spam</h3>
-        <h3>Spam</h3>
-        <h3>Spam</h3>
-        <h3>Spam</h3>
-        <h3>Spam</h3>
-        <h3>Spam</h3>
-      </div>
-
-      <div className="fourth-top">
-        <h2>Checkout Product</h2>
+        <div className="fourth-top">
+          <h2 id="switching-title">Checkout Product</h2>
+        </div>
       </div>
 
       <div className="sell-content">
         <div className="sell-cols">
 
           <div className="far-left-col">
-            <img className="highlight-img" alt="product-img" width="100px" height="100px" src={testProduct.productImageUrls[0]} />
-            <img className="highlight-img" alt="product-img" width="100px" height="100px" src={testProduct.productImageUrls[1]} />
-            <img className="highlight-img" alt="product-img" width="100px" height="100px" src={testProduct.productImageUrls[2]} />
+            <img onClick={() => imageClick(testProduct.productImageUrls[0])} className="highlight-img" alt="product-img" width="100px" height="100px" src={testProduct.productImageUrls[0]} />
+            <img onClick={() => imageClick(testProduct.productImageUrls[1])} className="highlight-img" alt="product-img" width="100px" height="100px" src={testProduct.productImageUrls[1]} />
+            <img onClick={() => imageClick(testProduct.productImageUrls[2])} className="highlight-img" alt="product-img" width="100px" height="100px" src={testProduct.productImageUrls[2]} />
           </div>
 
           <div className="center-left-col">
-            <img alt="product-img" src={testProduct.productImageUrls[0]} />
+            <img alt="product-img" src={currentImage} />
           </div>
 
           <div className="center-right-col">
@@ -159,9 +172,16 @@ const Checkout:React.FC = () => {
           </div>
 
         </div>
+
+
+        <div id="overlay">
+          {ethPrice && <div className="nft-content">
+            <NFTContainer nfts={nfts} product={testProduct} ethPrice={ethPrice} />
+          </div> }
+        </div>
       </div>
 
-      <div className="add-space">
+      {/* <div className="add-space">
         <h2></h2>
       </div>
 
@@ -172,7 +192,7 @@ const Checkout:React.FC = () => {
 
       {ethPrice && <div className="nft-content">
         <NFTContainer nfts={nfts} product={testProduct} ethPrice={ethPrice} />
-      </div> }
+      </div> } */}
 
       <div>
         <h2>Ayo? Tryna Mint?</h2>
