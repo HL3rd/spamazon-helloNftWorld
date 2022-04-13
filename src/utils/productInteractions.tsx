@@ -6,7 +6,7 @@ const barterContractInfo = require('../artifacts/Barter.json');
 const IERC721ContractInfo = require('../artifacts/IERC721.json');
 
 const WETH_CONTRACT_ADDRESS = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
-const IERC20Contract = require('../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json');
+const IERC20Contract = require('../artifacts/IERC20.json');
 
 const STORE_WALLET_ADDRESS = "0x2929C3c9805dD1A16546251b9b0B65583FD302c8"
 
