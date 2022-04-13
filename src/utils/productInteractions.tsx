@@ -171,17 +171,17 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
     }
   }
 
-  try {  
+  try {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     await provider.send("eth_requestAccounts", []);
     const signer = provider.getSigner();
 
-    const nftContractAddr = nft.asset_contract.address; // NFT contract address
-    const nftTokenId = nft.token_id; // NFT token id
-
     const testItemValueETH = (product.price / 100) / ethPrice;
     const testItemValueWei = ethers.utils.parseEther(`${testItemValueETH}`);
     console.log( `Item value in wei = ${testItemValueWei}`);
+
+    const nftContractAddr = nft.asset_contract.address; // NFT contract address
+    const nftTokenId = nft.token_id; // NFT token id
 
     // Approve trade before attempting exchange using OpenZeppelin
     // OpenZeppelin IERC721 functions are embedded in NFT contract so the ABI is functional
@@ -191,6 +191,8 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
 
     // Barter contract instance
     const barterContract = new ethers.Contract(BARTER_CONTRACT_ADDRESS, barterContractInfo.abi, signer);
+
+    // TODO ADD FIRESTORE CREATION FUNCTION HERE AND TRIGGER AT SAME TIME
     
     // Barter.sol, now approved, trigger the NFT exchange
     const tx_2 = await barterContract.collateralizedPurchase(
@@ -211,12 +213,10 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
     }
 
   } catch (error) {
-
     return {
       successs: false,
       status: `An error occurred while exchanging your NFT: ${error}`
     }
-
   }
 }
 
@@ -258,6 +258,8 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
     // Barter contract instance
     const barterContract = new ethers.Contract(BARTER_CONTRACT_ADDRESS, barterContractInfo.abi, signer);
     
+    // TODO: ADD FIRESTORE FUNCTION TO RECORD THIS PAYMENT AND UPDATE THE BALANCE OF A PRODUCT
+
     // WETH addr now approved, trigger the WETH transfer
     const transferTx = await barterContract.repay(
       buyerAddr,
