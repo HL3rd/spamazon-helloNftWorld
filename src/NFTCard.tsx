@@ -8,13 +8,14 @@ interface NFTCardProps {
 const NFTCard:React.FC<NFTCardProps> = ({ nft }) => {
 
   return (
-    <div style={{ backgroundColor: "white", borderRadius: "20px", width: "50%", padding: "10px", margin: "0px auto 15px auto" }}>
-      <img alt="nft-img" src={nft.image_url} />
-      <p>Collection: {nft.collection.slug}</p>
-      <p>Contract: {nft.asset_contract.address}, tokenId: {nft.token_id}</p>
+    <div style={{ color: "black", backgroundColor: "white", borderRadius: "20px", width: "50%", padding: "1em", margin: "2rem" }}>
+      <img alt="nft-img" width="60%" src={nft.image_url} />
       <p>Name: {nft.name}</p>
-      <p>{nft.description}</p>
-      <button onClick={() => transferNft(nft)}>Barter Me</button>
+      <p>Description: {nft.description}</p>
+      <p>Collection: {nft.collection.slug}</p>
+      <p>Contract: {nft.asset_contract.address}</p>
+      <p>tokenId: {nft.token_id}</p>
+      <button className="sell-btn" onClick={() => transferNft(nft)}>Barter Me</button>
     </div>
   )
 }
