@@ -11,7 +11,6 @@ export const formatStripeToUSD = (stripeInt:number) => {
         (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "")}`;
 }
 
-
 export const formatShortenContract = (longContractAddress:string) => {
   const decimals = "...";
   var splitContract = longContractAddress.split("");

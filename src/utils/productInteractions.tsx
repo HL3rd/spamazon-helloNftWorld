@@ -1,9 +1,12 @@
 import { Product } from '../constants/class-objects';
 import { ethers } from 'ethers';
 
-const BARTER_CONTRACT_ADDRESS = "0xF908424ee606CCcF49d71a87Ab7AB874a39e9CbD";
+const BARTER_CONTRACT_ADDRESS = "0xc24afecb277Dd2f5b50b5B51f1fC9d5b8234101A";
 const barterContractInfo = require('../artifacts/Barter.json');
 const IERC721ContractInfo = require('../artifacts/IERC721.json');
+
+const WETH_CONTRACT_ADDRESS = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
+const IERC20Contract = require('../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json');
 
 const STORE_WALLET_ADDRESS = "0x2929C3c9805dD1A16546251b9b0B65583FD302c8"
 
@@ -101,7 +104,7 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
  * Function triggers transfer of NFT from buyer wallet to store wallet
  * 
  */
- export const transferNft = async (nft:any) => {
+ export const exchangeNFT = async (nft:any) => {
 
   const buyerAddr = window.ethereum.selectedAddress;
 
@@ -136,6 +139,141 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
     return {
       success: true,
       status: `Hash: ${tx_2.hash} \n Successfully transferred NFT ${nftContractAddr} with tokenId ${nftTokenId} to ${selletAddr}`
+    }
+
+  } catch (error) {
+
+    return {
+      successs: false,
+      status: `An error occurred while exchanging your NFT: ${error}`
+    }
+
+  }
+}
+
+/**
+ * 
+ * @param nft 
+ * @returns 
+ * 
+ * Function triggers transfer of NFT from buyer wallet to Barter contract
+ * Barter.sol will hold the NFT as collateral until proper amount is paid to the store
+ * 
+ */
+ export const collateralizeNFT = async (nft:any, product:Product, ethPrice:any) => {
+
+  const buyerAddr = window.ethereum.selectedAddress;
+
+  if (!buyerAddr) {
+    return {
+      success: false,
+      status: `Error connecting your Wallet. Please try again.`
+    }
+  }
+
+  try {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+
+    const testItemValueETH = (product.price / 100) / ethPrice;
+    const testItemValueWei = ethers.utils.parseEther(`${testItemValueETH}`);
+    console.log( `Item value in wei = ${testItemValueWei}`);
+
+    const nftContractAddr = nft.asset_contract.address; // NFT contract address
+    const nftTokenId = nft.token_id; // NFT token id
+
+    // Approve trade before attempting exchange using OpenZeppelin
+    // OpenZeppelin IERC721 functions are embedded in NFT contract so the ABI is functional
+    const ierc721Abi = IERC721ContractInfo.abi;
+    const ierc721Contract = new ethers.Contract(nftContractAddr, ierc721Abi, signer);
+    await ierc721Contract.approve(BARTER_CONTRACT_ADDRESS, nftTokenId);
+
+    // Barter contract instance
+    const barterContract = new ethers.Contract(BARTER_CONTRACT_ADDRESS, barterContractInfo.abi, signer);
+
+    // TODO ADD FIRESTORE CREATION FUNCTION HERE AND TRIGGER AT SAME TIME
+    
+    // Barter.sol, now approved, trigger the NFT exchange
+    const tx_2 = await barterContract.collateralizedPurchase(
+      buyerAddr,
+      STORE_WALLET_ADDRESS,
+      nftContractAddr,
+      nftTokenId,
+      testItemValueWei,
+      {
+        from: buyerAddr,
+        gasLimit: 8000000
+      }
+    );
+
+    return {
+      success: true,
+      status: `Hash: ${tx_2.hash} \n Successfully transferred NFT ${nftContractAddr} with tokenId ${nftTokenId} to ${BARTER_CONTRACT_ADDRESS}`
+    }
+
+  } catch (error) {
+    return {
+      successs: false,
+      status: `An error occurred while exchanging your NFT: ${error}`
+    }
+  }
+}
+
+/**
+ * 
+ * @param nft 
+ * @returns 
+ * 
+ * Function allows user to repay in WETH to receive NFT again
+ * 
+ */
+ export const repayStore = async (nft:any, paymentInETH:any) => {
+
+  const buyerAddr = window.ethereum.selectedAddress;
+
+  if (!buyerAddr) {
+    return {
+      success: false,
+      status: `Error connecting your Wallet. Please try again.`
+    }
+  }
+
+  try {  
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+
+    const nftContractAddr = nft.asset_contract.address; // NFT contract address
+    const nftTokenId = nft.token_id; // NFT token id
+
+    const paymentInWei = ethers.utils.parseEther(`${paymentInETH}`);
+    console.log( `Item value in wei = ${paymentInWei}`);
+
+    // Approve trade before attempting exchange using OpenZeppelin
+    const ierc20Abi = IERC20Contract.abi;
+    const wethContract = new ethers.Contract(WETH_CONTRACT_ADDRESS, ierc20Abi, signer);
+    await wethContract.approve(BARTER_CONTRACT_ADDRESS, paymentInWei);
+
+    // Barter contract instance
+    const barterContract = new ethers.Contract(BARTER_CONTRACT_ADDRESS, barterContractInfo.abi, signer);
+    
+    // TODO: ADD FIRESTORE FUNCTION TO RECORD THIS PAYMENT AND UPDATE THE BALANCE OF A PRODUCT
+
+    // WETH addr now approved, trigger the WETH transfer
+    const transferTx = await barterContract.repay(
+      buyerAddr,
+      nftContractAddr,
+      nftTokenId,
+      paymentInWei,
+      { from: buyerAddr, gasLimit: 9000000 }
+    );
+    console.log(`repay transaction hash: ${transferTx.hash}`);
+    console.log(`Buyer ${buyerAddr} paid ${paymentInETH} ETH to store ${STORE_WALLET_ADDRESS}`);
+
+    return {
+      success: true,
+      status: `Hash: ${transferTx.hash} \n Successfully transferred NFT ${nftContractAddr} with tokenId ${nftTokenId} to ${BARTER_CONTRACT_ADDRESS}`
     }
 
   } catch (error) {
