@@ -21,9 +21,9 @@ const barterContract = new ethers.Contract(BARTER_CONTRACT_ADDRESS, contract.abi
 async function main() {
   
   const testBuyerAddr = "0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6"; // transfers the NFT token
+  const testSellerAddr = "0x6E9190A074371C3A1b96120D2b1A3834D9d51F64"; // receives the NFT token
   const testNftContractAddr = "0x08207fe7f1f7c9f1c39e4720b9f7bfe2afd01907"; // NFT contract address
   const testTokenId = 8; // NFT token id
-  const testSellerAddr = "0x6E9190A074371C3A1b96120D2b1A3834D9d51F64"; // receives the NFT token
   
   // Approve trade before attempting exchange using OpenZeppelin
   // OpenZeppelin IERC721 functions are embedded in NFT contract so the ABI is functional
