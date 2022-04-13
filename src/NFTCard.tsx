@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Product } from './constants/class-objects';
-import { canPurchaseCheck, transferNft } from './utils/productInteractions';
+import { canPurchaseCheck, exchangeNFT } from './utils/productInteractions';
 
 interface NFTCardProps {
   nft: any,
@@ -16,7 +16,7 @@ const NFTCard:React.FC<NFTCardProps> = ({ nft, product, ethPrice }) => {
     const checkResp = await canPurchaseCheck(nft, product, ethPrice);
     setStatus(checkResp.status);
     if (checkResp.success) {
-      const transferResp = await transferNft(nft);
+      const transferResp = await exchangeNFT(nft);
       setStatus(transferResp.status);
     }
   };

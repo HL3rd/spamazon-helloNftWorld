@@ -6,8 +6,9 @@ const { ethers } = require('hardhat');
 
 // Barter.sol Contract setup
 const BARTER_CONTRACT_ADDRESS = "0xc24afecb277Dd2f5b50b5B51f1fC9d5b8234101A";
-const WETH_CONTRACT_ADDRES = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
 const contract = require('../artifacts/contracts/Barter.sol/Barter.json');
+
+const WETH_CONTRACT_ADDRESS = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
 const IERC20Contract = require('../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json');
 
 // Provider
@@ -32,11 +33,11 @@ async function main() {
   
   // Approve trade before attempting exchange using OpenZeppelin
   const ierc20Abi = IERC20Contract.abi;
-  const wethContract = new ethers.Contract(WETH_CONTRACT_ADDRES, ierc20Abi, signer);
+  const wethContract = new ethers.Contract(WETH_CONTRACT_ADDRESS, ierc20Abi, signer);
   const tx_1 = await wethContract.approve(BARTER_CONTRACT_ADDRESS, testPaymentValueWei);
   console.log(`approve transaction hash: ${tx_1.hash}`);
   
-  // Barter.sol, now approved, trigger the WETH transfer
+  // WETH addr now approved, trigger the WETH transfer
   const tx_2 = await barterContract.repay(
     testBuyerAddr,
     testNftContractAddr,
