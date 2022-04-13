@@ -5,31 +5,36 @@ pragma solidity >=0.7.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "./Math.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-contract Barter is IERC721Receiver {
-    using Math for uint256;
-
-    // struct for what each person owes, specific to what they bought
+contract Barter is IERC721Receiver, AccessControlEnumerable {
+    // struct for what the buyer owes to the seller, and when
     struct userBorrow {
         uint256 amountOwed;
         address buyer;
         address seller;
+        uint256 timestamp;
     }
-
+    //track how much a wallet has borrowed against all thier NFTs
     mapping(address => uint256) totalborrowedETH;
 
-    // mapping: buyer -> NFT Contract => tokenID -> struct(money owed, buyer, seller)
+    // mapping: buyer -> NFT Contract -> tokenID -> struct(money owed, buyer, seller, purchase time)
     mapping(address => mapping(address => mapping(uint256 => userBorrow)))
         public loanTracker;
-    // will have to handle multiple purchases
 
+    //Rinkeby WETH contract address
     address public constant WETH = 0xc778417E063141139Fce010982780140Aa0cD5Ab;
 
-    address owner;
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
     constructor() {
-        owner = msg.sender;
+        _setupRole(ADMIN_ROLE, msg.sender);
+        _setupRole(ADMIN_ROLE, address(this));
+    }
+
+    modifier onlyOwner() {
+        require(hasRole(ADMIN_ROLE, msg.sender), "must have admin role");
+        _;
     }
 
     ///@notice function transfers ownership from buyer to seller
@@ -37,10 +42,16 @@ contract Barter is IERC721Receiver {
     function exchangeNFT(
         address _buyer,
         address _seller,
-        address _collection,        // TODO: Instead of _collection, I think you mean _nftContract or _contract
+        address _contract,
         uint256 _tokenID
     ) public {
-        IERC721(_collection).safeTransferFrom(_buyer, _seller, _tokenID);
+        /*
+    * Security:
+    * ower must approve this contract to move thier NFT so even if
+    someone else calls this function, it only works if user pre-approved it
+    */
+
+        IERC721(_contract).safeTransferFrom(_buyer, _seller, _tokenID);
     }
 
     ///@notice function transfers ownership from buyer to this contract to be held as collateral
@@ -51,78 +62,105 @@ contract Barter is IERC721Receiver {
     function collateralizedPurchase(
         address _buyer,
         address _seller,
-        address _collection,
+        address _contract,
         uint256 _tokenID,
         uint256 _itemValue
     ) public {
+        /*
+        * Security:
+        * NFT ower must approve this contract to move thier NFT so even if
+        someone else calls this function, it only works if user pre-approved it
+        * Only the initial buyer will recieve the NFT on repayment
+        */
+
         //if they purchsed from new seller with same NFT, they must have payed off thier old debts
-        if (loanTracker[_buyer][_collection][_tokenID].seller != _seller) {
-            require(loanTracker[_buyer][_collection][_tokenID].amountOwed == 0);
+        if (loanTracker[_buyer][_contract][_tokenID].seller != _seller) {
+            require(loanTracker[_buyer][_contract][_tokenID].amountOwed == 0);
         }
 
-        IERC721(_collection).safeTransferFrom(_buyer, address(this), _tokenID);
+        if (loanTracker[_buyer][_contract][_tokenID].timestamp == 0) {
+            loanTracker[_buyer][_contract][_tokenID].timestamp = block
+                .timestamp;
+        } // could also check for default here, but issues may arise, better to have default manually called
 
-        loanTracker[_buyer][_collection][_tokenID].amountOwed += _itemValue;
+        IERC721(_contract).safeTransferFrom(_buyer, address(this), _tokenID);
+
+        loanTracker[_buyer][_contract][_tokenID].amountOwed += _itemValue;
         totalborrowedETH[_buyer] += _itemValue;
-        loanTracker[_buyer][_collection][_tokenID].seller = _seller;
-        //redundant?
-        loanTracker[_buyer][_collection][_tokenID].buyer = _buyer;
+        loanTracker[_buyer][_contract][_tokenID].seller = _seller;
+        loanTracker[_buyer][_contract][_tokenID].buyer = _buyer;
     }
 
-    ///@notice buyer pays back what they owe in WETH only
-    ///@dev the calling contract/function must approve the transfer of ERC20 to the seller address
+    ///@notice a user pays back a debt in WETH only and original buyer recieves ERC721
+    ///@dev the calling contract/function must approve the transfer of ERC20 to the contract address
     function repay(
-        address _collection,
+        address _buyer,
+        address _contract,
         uint256 _tokenID,
         uint256 _amount
     ) public {
-        //require(msg.sender == loanTracker[msg.sender][_collection][_tokenID].buyer);
         //make sure user has enough WETH
         require(
             IERC20(WETH).balanceOf(msg.sender) >= _amount,
             "not enough WETH to repay"
         );
-        ///could use address _buyer
         require(
-            loanTracker[msg.sender][_collection][_tokenID].amountOwed >=
-                _amount,
+            loanTracker[_buyer][_contract][_tokenID].amountOwed >= _amount,
             "Cannot pay back more than you owe"
         );
 
         IERC20(WETH).transferFrom(
             msg.sender,
-            (loanTracker[msg.sender][_collection][_tokenID].seller),
+            (loanTracker[msg.sender][_contract][_tokenID].seller),
             _amount
         );
 
-        loanTracker[msg.sender][_collection][_tokenID].amountOwed -= _amount; //minimum( _amount, loanTracker[_buyer][_collection][_tokenID].amountOwed)
-        totalborrowedETH[msg.sender] -= _amount;
+        loanTracker[_buyer][_contract][_tokenID].amountOwed -= _amount; //minimum( _amount, loanTracker[_buyer][_contract][_tokenID].amountOwed)
+        totalborrowedETH[_buyer] -= _amount;
 
         //send NFT if debt is paid
-        if (loanTracker[msg.sender][_collection][_tokenID].amountOwed == 0) {
-            IERC721(_collection).safeTransferFrom(
+        if (loanTracker[_buyer][_contract][_tokenID].amountOwed == 0) {
+            IERC721(_contract).safeTransferFrom(
                 address(this),
-                msg.sender,
+                loanTracker[_buyer][_contract][_tokenID].buyer,
                 _tokenID
             );
+            //reset struct values:
+            loanTracker[_buyer][_contract][_tokenID].timestamp = 0;
+            loanTracker[_buyer][_contract][_tokenID].buyer = address(0);
+            loanTracker[_buyer][_contract][_tokenID].seller = address(0);
         }
     }
 
     ///@notice upon defualt, the store gets th NFT, and the user no longer owes money.
     function handleDefault(
         address _buyer,
-        address _collection,
+        address _contract,
         uint256 _tokenID
-    ) public {
-        IERC721(_collection).safeTransferFrom(
+    ) public onlyOwner {
+        /*
+         * Security:
+         * Only owner can call this right now
+         * Can only be called 30 days after first purchase
+         */
+        require(
+            block.timestamp >
+                (loanTracker[_buyer][_contract][_tokenID].timestamp + 2592000),
+            "Buyer has minumum 30 days to repay"
+        );
+
+        IERC721(_contract).safeTransferFrom(
             address(this),
-            loanTracker[_buyer][_collection][_tokenID].seller,
+            loanTracker[_buyer][_contract][_tokenID].seller,
             _tokenID
         );
-        loanTracker[_buyer][_collection][_tokenID].amountOwed = 0;
-        //delete mapping? or set buyer/seller to zero address?
-
-        //take after 30 days
+        //reset mapping values
+        totalborrowedETH[_buyer] -= loanTracker[_buyer][_contract][_tokenID]
+            .amountOwed;
+        loanTracker[_buyer][_contract][_tokenID].amountOwed = 0;
+        loanTracker[_buyer][_contract][_tokenID].timestamp = 0;
+        loanTracker[_buyer][_contract][_tokenID].buyer = address(0);
+        loanTracker[_buyer][_contract][_tokenID].seller = address(0);
     }
 
     function onERC721Received(
@@ -136,34 +174,46 @@ contract Barter is IERC721Receiver {
 
     //_____________________________Helper Functions Begin Here_____________________________//
 
-    function minimum(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a.min(b);
-    }
+    // function minimum(uint256 a, uint256 b) internal pure returns (uint256) {
+    //     return a.min(b);
+    // }
 
     ///@notice returns the total eth quantity owed by a user
     function totalValueBorrowed(address _buyer) public view returns (uint256) {
         return totalborrowedETH[_buyer];
     }
 
-    ///@notice returns value owed on 1 NFT used as collateral
+    ///@notice returns value owed on a specific NFT used as collateral
     function valueBorrowedOneNFT(
         address _buyer,
-        address _collection,
+        address _contract,
         uint256 _tokenID
     ) public view returns (uint256) {
-        return loanTracker[_buyer][_collection][_tokenID].amountOwed;
+        return loanTracker[_buyer][_contract][_tokenID].amountOwed;
     }
 
     ///@notice returns address of seller who has an NFT as collateral
     function sellerCollateralNFT(
         address _buyer,
-        address _collection,
+        address _contract,
         uint256 _tokenID
     ) public view returns (address) {
-        return loanTracker[_buyer][_collection][_tokenID].seller;
+        return loanTracker[_buyer][_contract][_tokenID].seller;
     }
 
-    function emergencyExit(address nft, uint256 _tokenID) public {
-        IERC721(nft).safeTransferFrom(address(this), msg.sender, _tokenID);
+    function emergencyExit(address _contract, uint256 _tokenID)
+        public
+        onlyOwner
+    {
+        IERC721(_contract).safeTransferFrom(
+            address(this),
+            msg.sender,
+            _tokenID
+        );
+    }
+
+    //add owners to contract
+    function addOwner(address _newOwner) public onlyOwner {
+        _setupRole(ADMIN_ROLE, _newOwner);
     }
 }

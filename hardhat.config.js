@@ -7,7 +7,22 @@
  const { REACT_APP_ALCHEMY_URL, REACT_APP_PRIVATE_KEY } = process.env;
 
  module.exports = {
-    solidity: "0.7.0",
+    solidity: {
+       compilers: [
+          {
+             version: "0.7.0",
+          },
+          {
+             version: "0.7.3",
+          },
+          {
+             version: "0.8.0",
+          },
+          {
+             version: "0.8.1",
+          },
+       ],
+    },
     defaultNetwork: "rinkeby",
     networks: {
        hardhat: {},

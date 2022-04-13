@@ -1,7 +1,7 @@
 import { Product } from '../constants/class-objects';
 import { ethers } from 'ethers';
 
-const BARTER_CONTRACT_ADDRESS = "0xF908424ee606CCcF49d71a87Ab7AB874a39e9CbD";
+const BARTER_CONTRACT_ADDRESS = "0xc24afecb277Dd2f5b50b5B51f1fC9d5b8234101A";
 const barterContractInfo = require('../artifacts/Barter.json');
 const IERC721ContractInfo = require('../artifacts/IERC721.json');
 

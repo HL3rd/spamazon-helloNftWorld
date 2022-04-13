@@ -5,7 +5,7 @@ const PRIVATE_KEY = process.env.REACT_APP_PRIVATE_KEY;
 const { ethers } = require('hardhat');
 
 // Barter.sol Contract setup
-const BARTER_CONTRACT_ADDRESS = "0xF908424ee606CCcF49d71a87Ab7AB874a39e9CbD";
+const BARTER_CONTRACT_ADDRESS = "0xc24afecb277Dd2f5b50b5B51f1fC9d5b8234101A";
 const contract = require('../artifacts/contracts/Barter.sol/Barter.json');
 const IERC721Contract = require('../artifacts/@openzeppelin/contracts/token/ERC721/IERC721.sol/IERC721.json');
 
