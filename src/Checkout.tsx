@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 
 import { connectWallet } from './utils/interact';
+import { getETHPriceInUSD } from './utils/productInteractions';
+import { formatStripeToUSD } from './utils/format';
 
 import NFTContainer from './NFTContainer';
 
-import { Product, ProductOrder } from './constants/class-objects';
+import { Product } from './constants/class-objects';
 
 const Checkout:React.FC = () => {
 
@@ -19,14 +21,11 @@ const Checkout:React.FC = () => {
     quantity: 100,
   }
 
-  // NOTE: THIS IS THE TEST WALLET ADDRESS FROM THIS DOCUMENTATION:
-  // https://api.rarible.org/v0.1/doc#operation/getItemsByOwner
-  const testWalletAddress = "0x60f80121c31a0d46b5279700f9df786054aa5ee5"
-
   const [errorMessage, setErrorMessage] = useState('');
   const [walletAddress, setWalletAddress] = useState(null);
   const [userBalance, setUserBalance] = useState('');
   const [nfts, setNfts] = useState([]);
+  const [ethPrice, setETHPrice] = useState();
 
   const connectWalletCheckout = async () => {
 
@@ -84,6 +83,16 @@ const Checkout:React.FC = () => {
   // If user changes testnets or test to devnet, reload site
   (window as any).ethereum.on('chainChanged', chainChangedHandler);
 
+  // NFTs will not show until ETH price is set
+  const callEthPriceCheck = async () => {
+    const price = await getETHPriceInUSD();
+    setETHPrice(price);
+  };
+
+  useEffect(() => {
+    callEthPriceCheck();
+  }, []);
+
   return (
     <body>
       <div className="top">
@@ -126,7 +135,6 @@ const Checkout:React.FC = () => {
         <h2>Checkout Product</h2>
       </div>
 
-
       <div className="sell-content">
         <div className="sell-cols">
 
@@ -162,9 +170,9 @@ const Checkout:React.FC = () => {
         <h2>Your NFTs</h2>
       </div>
 
-      <div className="nft-content">
-        <NFTContainer nfts={nfts} />
-      </div>
+      {ethPrice && <div className="nft-content">
+        <NFTContainer nfts={nfts} product={testProduct} ethPrice={ethPrice} />
+      </div> }
 
       <div>
         <h2>Ayo? Tryna Mint?</h2>
