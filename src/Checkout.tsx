@@ -175,7 +175,7 @@ const Checkout:React.FC = () => {
 
 
         <div id="overlay">
-          {ethPrice && <div className="nft-content">
+          {ethPrice && <div>
             <NFTContainer nfts={nfts} product={testProduct} ethPrice={ethPrice} />
           </div> }
         </div>
