@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Product } from './constants/class-objects';
 import { canPurchaseCheck, collateralizeNFT, exchangeNFT } from './utils/productInteractions';
+import { formatShortenContract } from './utils/format';
 
 interface NFTCardProps {
   nft: any,
@@ -29,15 +30,14 @@ const NFTCard:React.FC<NFTCardProps> = ({ nft, product, ethPrice }) => {
   };
 
   return (
-    <div style={{ backgroundColor: "white", borderRadius: "20px", width: "50%", padding: "10px", margin: "0px auto 15px auto" }}>
-      <img alt="nft-img" src={nft.image_url} style={{ maxWidth: "80%" }}/>
-      <p>Collection: {nft.collection.slug}</p>
-      <p>Contract: {nft.asset_contract.address}, tokenId: {nft.token_id}</p>
+    <div style={{ color: "black", backgroundColor: "white", borderRadius: "20px", width: "50%", padding: "1em", margin: "3.5rem" }}>
+      <img alt="nft-img" width="60%" src={nft.image_url} />
       <p>Name: {nft.name}</p>
-      <p>{nft.description}</p>
-      <button onClick={() => executeInstantBarter(nft, product, ethPrice)}>Barter Me</button>
-      <button onClick={() => executeCollateralizedPurchase(nft, product, ethPrice)}>Buy Now Pay Later</button>
-      <p>{status}</p>
+      <p>Description: {nft.description}</p>
+      <p>Collection: {nft.collection.slug}</p>
+      <p>Contract: {formatShortenContract(nft.asset_contract.address)}</p>
+      <p>TokenId: {nft.token_id}</p>
+      <button className="sell-btn" onClick={() => executeInstantBarter(nft, product, ethPrice)}>Barter Me</button>
     </div>
   )
 }
