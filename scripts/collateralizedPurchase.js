@@ -25,7 +25,7 @@ async function main() {
   const testNftContractAddr = "0x08207fe7f1f7c9f1c39e4720b9f7bfe2afd01907"; // NFT contract address
   const testTokenId = 11;  // NFT token id
   const testItemValueETH = 1;
-  const testItemValueWei = ethers.utils.parseEther(`${testItemValueETH}`)
+  const testItemValueWei = ethers.utils.parseEther(`${testItemValueETH}`);
   console.log( `Item value in wei = ${testItemValueWei}`);
   
   // Approve trade before attempting exchange using OpenZeppelin
