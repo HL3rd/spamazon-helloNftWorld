@@ -28,13 +28,22 @@ const Checkout:React.FC = () => {
   const [ethPrice, setETHPrice] = useState();
   const [currentImage, setCurrentImage] = useState(testProduct.productImageUrls[0]);
 
+  // const removeOverlay = () => {
+  //   document.getElementById('overlay')!.style.opacity = "0"; // added to remove overlay
+  //   document.getElementById('overlay')!.style.height = "0";
+  //   document.getElementById('overlay')!.style.width = "0";
+  //   let myContainer = document.getElementById('switching-title') as HTMLInputElement;
+  //   myContainer.innerHTML = `<h2>Checkout Product</h2>`;
+
+  // }
+
   const connectWalletCheckout = async () => {
 
     document.getElementById('overlay')!.style.opacity = "1"; // added for overlay
     document.getElementById('overlay')!.style.height = "80vh";
     document.getElementById('overlay')!.style.width = "100%";
     let myContainer = document.getElementById('switching-title') as HTMLInputElement;
-    myContainer.innerHTML = "Your NFTs";
+    myContainer.innerHTML = `<h2>Your NFTs</h2>` //<button className="close-btn" onClick={${() => removeOverlay}}>X</button>`;
 
     const resp:any = await connectWallet();
     const addr = resp.address;
@@ -143,8 +152,8 @@ const Checkout:React.FC = () => {
           <h3>Spam</h3>
         </div>
 
-        <div className="fourth-top">
-          <h2 id="switching-title">Checkout Product</h2>
+        <div className="fourth-top" id="switching-title">
+          <h2>Checkout Product</h2>
         </div>
       </div>
 
