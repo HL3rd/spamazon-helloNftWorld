@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-
 import { connectWallet } from './utils/interact';
-import { getETHPriceInUSD } from './utils/productInteractions';
-import { formatStripeToUSD } from './utils/format';
+import { getNFTData, getETHPriceInUSD } from './queries/NftData';
+
+import { Product } from './constants/class-objects';
 
 import Navbar from './components/Navbar';
 import NFTContainer from './NFTContainer';
-
-import { Product } from './constants/class-objects';
+import PurchaseModal from './components/PurchaseModal';
 
 const Checkout:React.FC = () => {
 
@@ -22,51 +21,45 @@ const Checkout:React.FC = () => {
     quantity: 100,
   };
 
+  // Front end state vars
+  const [currentImage, setCurrentImage] = useState(testProduct.productImageUrls[0]);
+  // Wallet state vars
   const [errorMessage, setErrorMessage] = useState('');
   const [walletAddress, setWalletAddress] = useState(null);
   const [userBalance, setUserBalance] = useState('');
+  // NFT Purchase state vars
+  const [callingNfts, setCallingNfts] = useState(false);
   const [nfts, setNfts] = useState([]);
   const [ethPrice, setETHPrice] = useState(null);
-  const [currentImage, setCurrentImage] = useState(testProduct.productImageUrls[0]);
-  const [nftsVisible, setNftsVisible] = useState(false);
-  const [isInstantBarter, setInstantBater] = useState(false);
+  const [isInstantBarter, setInstantBarter] = useState(false);
+  // Modal visibility
+  const [nftsVisible, setNftsVisible] = useState(false);  // When true, shows Choose NFTs Modal
+  const [selectedNft, setSelectedNft] = useState(null);   // When true, shows Purchase Modal
 
-  const instantBarterCheckout = async () => {
+  const checkoutClicked = async (instant:boolean) => {
 
+    // Connect Wallet if needed
     const resp:any = await connectWallet();
     const addr = resp.address;
-
-    setInstantBater(true);
-
-    setNftsVisible(true);
-
     if (addr !== "") {
       accountChangedHandler(addr);
     } else {
       setErrorMessage(resp.status)
     }
-  }
 
-  const collateralCheckout = async () => {
-
-    const resp:any = await connectWallet();
-    const addr = resp.address;
-
-    setInstantBater(false);
-
+    setInstantBarter(instant);
     setNftsVisible(true);
-
-    if (addr !== "") {
-      accountChangedHandler(addr);
-    } else {
-      setErrorMessage(resp.status)
-    }
   }
 
-  const accountChangedHandler = (newAccount:any) => {
+  const accountChangedHandler = async (newAccount:any) => {
     setWalletAddress(newAccount);
     getUserBalance(newAccount.toString());
-    getNFTData(newAccount);
+
+    if (!callingNfts) {
+      const nftResp = await getNFTData(newAccount);
+      setCallingNfts(false);
+      setNfts(nftResp);
+    }
   }
 
   const getUserBalance = (address:any) => {
@@ -74,27 +67,6 @@ const Checkout:React.FC = () => {
       .then((balance:any) => {
           setUserBalance(ethers.utils.formatEther(balance));
       })
-  }
-
-  const getNFTData = async(address:any) => {
-
-    // TODO: Use this for production/mainnet API
-    // const options = {
-    //   method: 'GET',
-    //   headers: {Accept: 'application/json', 'X-API-KEY': ''},
-    // };
-    const options = {
-      method: 'GET',
-    };
-    
-    const response = await fetch(`https://rinkeby-api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=0&limit=20`, options);
-    const data = await response.json();
-
-    if (data === undefined || data === null) {
-      setErrorMessage(`NFTs not found`);
-    } else {
-      setNfts(data.assets);
-    }
   }
 
   const chainChangedHandler = (newChain:any) => {
@@ -146,18 +118,28 @@ const Checkout:React.FC = () => {
           <div className="far-right-col">
             <p style={{ textAlign: 'left' }}>{testProduct.price}</p>
             <p style={{ textAlign: 'left' }}>FREE delivery <strong>to the Metaverse.</strong></p>
-            <button disabled={ethPrice == null} onClick={instantBarterCheckout} className="buy-btn">One-click barter</button>
-            <button disabled={ethPrice == null} onClick={collateralCheckout} className="sell-btn">Dump now, pay later</button>
+            <button disabled={ethPrice == null} onClick={() => checkoutClicked(true)} className="buy-btn">One-click barter</button>
+            <button disabled={ethPrice == null} onClick={() => checkoutClicked(false)} className="sell-btn">Dump now, pay later</button>
           </div>
         </div>
       {nftsVisible &&
         <div id="overlay">
           <NFTContainer
             nfts={nfts}
+            selectedNft={selectedNft}     // If present, the other Barter buttons on Cards are disabled
+            setNftsVisible={setNftsVisible}
+            setSelectedNft={setSelectedNft}
+          />
+        </div>}
+        {selectedNft &&
+        <div id="purchaseOverlay">
+          <PurchaseModal
+            selectedNft={selectedNft}
             product={testProduct}
             ethPrice={ethPrice}
             isInstantBarter={isInstantBarter}
             setNftsVisible={setNftsVisible}
+            setSelectedNft={setSelectedNft}
           />
         </div>}
       </div>

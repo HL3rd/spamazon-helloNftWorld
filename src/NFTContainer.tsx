@@ -4,24 +4,28 @@ import NFTCard from './NFTCard';
 
 interface NFTContainerProps {
   nfts: Array<any>,
-  product: Product,
-  ethPrice: any,
-  isInstantBarter: boolean,
   setNftsVisible: any,
+  selectedNft: any,
+  setSelectedNft: any,
 }
 
-const NFTContainer:React.FC<NFTContainerProps> = ({ nfts, product, ethPrice, isInstantBarter, setNftsVisible }) => {
+const NFTContainer:React.FC<NFTContainerProps> = ({ nfts, setNftsVisible, selectedNft, setSelectedNft }) => {
 
   return (
     <div>
-      <div style={{ textAlign: 'right', alignItems: 'right', marginRight: '20px' }}>
+      <div style={{ textAlign: 'left', alignItems: 'left', marginLeft: '20px' }}>
         <button onClick={() => setNftsVisible(false)}>
           X
         </button>
       </div>
       <div className="nft-content">
         { nfts.map((nft:any, index:any) => {
-          return <NFTCard nft={nft} product={product} ethPrice={ethPrice} isInstantBarter={isInstantBarter} key={index} />
+          return <NFTCard 
+                    nft={nft}
+                    selectedNft={selectedNft}
+                    setSelectedNft={setSelectedNft}
+                    key={index}
+                  />
         })}
       </div>
     </div>

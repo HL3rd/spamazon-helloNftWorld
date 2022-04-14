@@ -16,20 +16,6 @@ declare var window: any;
 
 /**
  * 
- * @returns ETH price in USD
- * 
- */
-export const getETHPriceInUSD = async () => {
-  const options = {
-    method: 'GET',
-  };
-  const resp = await fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD', options);
-  const data = await resp.json();
-  return data.USD;
-}
-
-/**
- * 
  * @param nft 
  * @returns 
  * 
