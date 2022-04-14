@@ -7,12 +7,14 @@ import Minter from './Minter';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import ProductPayments from './ProductPayments';
 
 function App() {
   return (
     <div className="App">
       <Routes>
         <Route path="/" element={ <Home /> } />
+        <Route path="/productpayments" element={ <ProductPayments/>} />
         <Route path="/checkout" element={ <Checkout/>} />
         <Route path="/minter" element={ <Minter /> } />
       </Routes>

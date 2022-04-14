@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { connectWallet } from './utils/interact';
+import { formatStripeToUSDString } from './utils/format';
+
+import NFTContainer from './NFTContainer';
+
 import { getNFTData, getETHPriceInUSD } from './queries/NftData';
 
 import { Product } from './constants/class-objects';

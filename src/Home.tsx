@@ -12,11 +12,20 @@ const Home = () => {
             </div>
           </a>
           
-          <a href="/checkout">
-            <div>
-              <h2 className="checkout">Checkout</h2>
-            </div>
-          </a>
+          <div className="right-side">
+            <a href="/productpayments">
+              <div>
+                <h2 className="productpayments">Account &amp; Payments</h2>
+              </div>
+            </a>
+
+
+            <a href="/checkout">
+              <div>
+                <h2 className="checkout">Checkout</h2>
+              </div>
+            </a>
+          </div>
         </div>
 
         <div className="second-top">

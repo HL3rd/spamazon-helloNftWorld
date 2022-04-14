@@ -6,7 +6,7 @@ export function getCurrentTimestamp() {
   return (Math.round((new Date()).getTime() / 1000));
 }
 
-export const formatStripeToUSD = (stripeInt:number) => {
+export const formatStripeToUSDString = (stripeInt:number) => {
   const decPlaces = 2;
   const decSep = ".";
   const thouSep = ",";
@@ -29,3 +29,10 @@ export const formatShortenContract = (longContractAddress:string) => {
 
   return `0x${shortContractAddress}`
 }
+
+// export const formatStripe = (stripeInt:number) => {
+
+
+
+
+// }
