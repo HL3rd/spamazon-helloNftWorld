@@ -5,6 +5,7 @@ import { OutstandingNftBalance } from './constants/class-objects';
 import './App.css';
 import { ProgressBar } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { formatStripeToUSDString } from './utils/format';
 
 const ProductPayments: React.FC = () => {
 

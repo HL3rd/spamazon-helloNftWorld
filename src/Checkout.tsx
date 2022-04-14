@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 
 import { connectWallet } from './utils/interact';
 import { getETHPriceInUSD } from './utils/productInteractions';
-import { formatStripeToUSD } from './utils/format';
+import { formatStripeToUSDString } from './utils/format';
 
 import NFTContainer from './NFTContainer';
 
