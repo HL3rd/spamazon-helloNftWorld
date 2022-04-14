@@ -26,19 +26,35 @@ const Checkout:React.FC = () => {
   const [walletAddress, setWalletAddress] = useState(null);
   const [userBalance, setUserBalance] = useState('');
   const [nfts, setNfts] = useState([]);
-  const [ethPrice, setETHPrice] = useState();
+  const [ethPrice, setETHPrice] = useState(null);
   const [currentImage, setCurrentImage] = useState(testProduct.productImageUrls[0]);
+  const [nftsVisible, setNftsVisible] = useState(false);
+  const [isInstantBarter, setInstantBater] = useState(false);
 
-  const connectWalletCheckout = async () => {
-
-    document.getElementById('overlay')!.style.opacity = "1"; // added for overlay
-    document.getElementById('overlay')!.style.height = "80vh";
-    document.getElementById('overlay')!.style.width = "100%";
-    let myContainer = document.getElementById('switching-title') as HTMLInputElement;
-    myContainer.innerHTML = "Your NFTs";
+  const instantBarterCheckout = async () => {
 
     const resp:any = await connectWallet();
     const addr = resp.address;
+
+    setInstantBater(true);
+
+    setNftsVisible(true);
+
+    if (addr !== "") {
+      accountChangedHandler(addr);
+    } else {
+      setErrorMessage(resp.status)
+    }
+  }
+
+  const collateralCheckout = async () => {
+
+    const resp:any = await connectWallet();
+    const addr = resp.address;
+
+    setInstantBater(false);
+
+    setNftsVisible(true);
 
     if (addr !== "") {
       accountChangedHandler(addr);
@@ -128,69 +144,30 @@ const Checkout:React.FC = () => {
           </div>
 
           <div className="far-right-col">
-            <button onClick={connectWalletCheckout} className="buy-btn">One-click barter</button>
+            <p style={{ textAlign: 'left' }}>{testProduct.price}</p>
+            <p style={{ textAlign: 'left' }}>FREE delivery <strong>whenver we get to it.</strong></p>
+            <button disabled={ethPrice == null} onClick={instantBarterCheckout} className="buy-btn">One-click barter</button>
+            <button disabled={ethPrice == null} onClick={collateralCheckout} className="sell-btn">Dump now, pay later</button>
           </div>
-
         </div>
-
-
+      {nftsVisible &&
         <div id="overlay">
-          {ethPrice && <div>
-            <NFTContainer nfts={nfts} product={testProduct} ethPrice={ethPrice} />
-          </div> }
-        </div>
+          <NFTContainer
+            nfts={nfts}
+            product={testProduct}
+            ethPrice={ethPrice}
+            isInstantBarter={isInstantBarter}
+            setNftsVisible={setNftsVisible}
+          />
+        </div>}
       </div>
-
-      {/* <div className="add-space">
-        <h2></h2>
-      </div>
-
-
-      <div className="fifth-top">
-        <h2>Your NFTs</h2>
-      </div>
-
-      {ethPrice && <div className="nft-content">
-        <NFTContainer nfts={nfts} product={testProduct} ethPrice={ethPrice} />
-      </div> } */}
 
       <div>
         <h2>Ayo? Tryna Mint?</h2>
         <h3><a href="/minter">Minter</a></h3>
       </div>
-
-        
-      
+            
     </body>
-
-
-
-
-
-
-    // <div>
-    //   <h1>Checkout product</h1>
-    //   <img alt="product-img" width="20%" src={testProduct.productImageUrls[0]} />
-    //   <h2>{testProduct.name}</h2>
-    //   <p>{testProduct.description}</p>
-    //   <p>{testProduct.price}</p>
-    //   <button onClick={connectWalletCheckout}>One-click barter</button>
-    //   <div>
-    //     <p>Address: {walletAddress}</p>
-    //   </div>
-    //   <div>
-    //     <p>Balance: { userBalance }</p>
-    //     <p>{errorMessage}</p>
-    //   </div>
-    //   <div>
-    //     <h2>Ayo? Tryna Mint?</h2>
-    //     <h3><a href="/minter">Minter</a></h3>
-    //   </div>
-    //   <div>
-    //     <h2>Your NFTs</h2>
-    //     <NFTContainer nfts={nfts} />
-    //   </div>
-    // </div>
   );
 }
 

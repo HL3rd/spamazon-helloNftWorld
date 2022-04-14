@@ -6,10 +6,11 @@ import { formatShortenContract } from './utils/format';
 interface NFTCardProps {
   nft: any,
   product: Product,
-  ethPrice: any
+  ethPrice: any,
+  isInstantBarter: boolean
 }
 
-const NFTCard:React.FC<NFTCardProps> = ({ nft, product, ethPrice }) => {
+const NFTCard:React.FC<NFTCardProps> = ({ nft, product, ethPrice, isInstantBarter }) => {
 
   const [status, setStatus] = useState("");
 
@@ -24,13 +25,10 @@ const NFTCard:React.FC<NFTCardProps> = ({ nft, product, ethPrice }) => {
 
   const executeCollateralizedPurchase = async (nft:any, product:Product, ethPrice:any) => {
     const collateralResp = await collateralizeNFT(nft, product, ethPrice);
-
-    
-
   };
 
   return (
-    <div style={{ color: "black", backgroundColor: "white", borderRadius: "20px", width: "50%", padding: "1em", margin: "3.5rem" }}>
+    <div className="nft-card">
       <img alt="nft-img" width="60%" src={nft.image_url} />
       <p>Name: {nft.name}</p>
       <p>Description: {nft.description}</p>
