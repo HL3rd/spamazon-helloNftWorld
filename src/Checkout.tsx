@@ -19,7 +19,7 @@ const Checkout:React.FC = () => {
     name: 'Guide to the Universe Book',
     price: 10000,
     quantity: 100,
-  }
+  };
 
   const [errorMessage, setErrorMessage] = useState('');
   const [walletAddress, setWalletAddress] = useState(null);
