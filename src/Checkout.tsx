@@ -145,7 +145,7 @@ const Checkout:React.FC = () => {
 
           <div className="far-right-col">
             <p style={{ textAlign: 'left' }}>{testProduct.price}</p>
-            <p style={{ textAlign: 'left' }}>FREE delivery <strong>whenver we get to it.</strong></p>
+            <p style={{ textAlign: 'left' }}>FREE delivery <strong>to the Metaverse.</strong></p>
             <button disabled={ethPrice == null} onClick={instantBarterCheckout} className="buy-btn">One-click barter</button>
             <button disabled={ethPrice == null} onClick={collateralCheckout} className="sell-btn">Dump now, pay later</button>
           </div>

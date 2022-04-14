@@ -279,9 +279,12 @@ a:hover {
 
 #overlay {
   position: absolute;
+  display: flex;
+  flex-direction: row;
+  overflow: scroll;
   bottom: 0;
   width: 100%;
-  height: 80vh;
+  height: 100%;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(6px);
 }
@@ -290,6 +293,7 @@ a:hover {
   display: flex;
   flex-direction: row;
   overflow: scroll;
+  width: 100%;
   height: 100%;
   padding: 10px 0px 10px 10px;
 }
@@ -298,15 +302,35 @@ a:hover {
   color: black; 
   background-color: white;
   border-radius: 20px;
-  width: 50%;
-  height: 80%;
-  padding: 1em;
+  width: 25em;
+  height: 30em;
+  padding: 10px 10px 10px 10px;
   margin: 10px 3.5em 10px 10px;
 }
 
+.nft-card-img {
+  height: 45%;
+  width: 100%;
+  border-radius: 20px;
+  object-fit: cover;
+}
 
+.nft-details {
+  height: 30%;
+}
 
+.nft-details a {
+  color: rgb(19, 168, 138);
+}
 
+#purchaseOverlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+}
 
 /* .product-selling {
   background: white;
