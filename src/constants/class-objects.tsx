@@ -9,6 +9,31 @@ export type Scalars = {
   Timestamp: any;
 };
 
+export type OutstandingNftBalance = {
+  amountOwed: Scalars['Float'];
+  amountOwedStart: Scalars['Float'];
+  buyerAddress: Scalars['String'];
+  createdAt: Scalars['Int'];
+  id: Scalars['String'];
+  nftContractAddress: Scalars['String'];
+  nftTokenId: Scalars['Int'];
+  product: Product;
+  sellerAddress: Scalars['String'];
+};
+
+export type EndedNftBalance = {
+  amountOwed: Scalars['Float'];
+  amountOwedStart: Scalars['Float'];
+  buyerAddress: Scalars['String'];
+  createdAt: Scalars['Int'];
+  id: Scalars['String'];
+  nftContractAddress: Scalars['String'];
+  nftTokenId: Scalars['Int'];
+  outstandingBalanceCreatedAt: Scalars['Int'];
+  product: Product;
+  sellerAddress: Scalars['String'];
+};
+
 export type Product = {
   description: Scalars['String'];
   productImageUrls: Array<Scalars['String']>;
