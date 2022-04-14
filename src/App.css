@@ -37,6 +37,11 @@ h3 {
   padding-top: 0.4em;
 }
 
+h4 {
+  text-align: left;
+  margin: 1em;
+}
+
 p {
   margin: 1em;
   font-size: 1em;
@@ -139,6 +144,7 @@ a:hover {
 .fourth-top {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   background: #cccccc;
   color: #000000;
   font-weight: bold;
@@ -309,6 +315,54 @@ a:hover {
   height: 70vh;
   padding: 10px 10px 10px 10px;
   margin: 10px 3.5em 10px 10px;
+}
+
+.home-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.first-row,
+.second-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  /* border: 1px solid red; */
+}
+
+.first-row {
+  margin-top: 4vh;
+}
+
+.home-box {
+  color: #111111;
+  background: #ffffff;
+  width: 22vw;
+  height: 50vh;
+  margin-bottom: 4vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.product-link {
+  color: #146eb4;
+}
+
+.product-link:hover,
+.product-link:focus {
+  color: #e47911;
+  text-decoration: none;
+  border-bottom: 1px solid #e47911;
+}
+
+.box-image {
+  width: 84%;
+  height: 60%;
+  border: 1px solid red;
+  align-self: center;
 }
 
 .nft-card-img {
