@@ -23,6 +23,9 @@ declare var window: any;
  * Then calls ethe OpenSea API with the slug to collect floor_price
  * 
  */
+
+const delay = (ms:number) => new Promise(res => setTimeout(res, ms));
+
 const openSeaCollectionFloorPrice = async (nft:any) => {
   const options = {
     method: 'GET'
@@ -35,6 +38,8 @@ const openSeaCollectionFloorPrice = async (nft:any) => {
   const slug = assetData.collection.slug;
 
   console.log(`SLUG: ${slug}`);
+
+  await delay(2000);
 
   // Use collection slug to query proper eth floor price
   const collectionResp = await fetch(`https://testnets-api.opensea.io/api/v1/collection/${slug}/stats`, options);
@@ -64,6 +69,7 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
 
   const floorPriceETH = await openSeaCollectionFloorPrice(nft);
   const floorPriceUSD = floorPriceETH * ethPrice;
+  // const floorPriceUSD = 100000;
   const prodPriceUSD = product.price / 100;
 
   console.log(`GOT THIS FLOOR PRICE: ${floorPriceETH} = ${floorPriceUSD}`)
@@ -73,6 +79,8 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
     console.log(`Can execute the trade!`);
     return {
       success: true,
+      floorPriceETH,
+      floorPriceUSD,
       status: `About to transfer dis NFT`
     }
   } else {
@@ -80,6 +88,8 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
     console.log(`Insufficient market value`);
     return {
       success: false,
+      floorPriceETH,
+      floorPriceUSD,
       status: `Insufficient market value: the floor price of this NFT (${floorPriceETH}ETH , $${floorPriceUSD}) is not enough to barter with this product (${prodPriceUSD})`
     }
   }
@@ -133,7 +143,7 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
   } catch (error) {
 
     return {
-      successs: false,
+      success: false,
       status: `An error occurred while exchanging your NFT: ${error}`
     }
 

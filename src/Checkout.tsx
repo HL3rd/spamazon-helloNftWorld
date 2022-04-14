@@ -138,7 +138,6 @@ const Checkout:React.FC = () => {
             product={testProduct}
             ethPrice={ethPrice}
             isInstantBarter={isInstantBarter}
-            setNftsVisible={setNftsVisible}
             setSelectedNft={setSelectedNft}
           />
         </div>}
