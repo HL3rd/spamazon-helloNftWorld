@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-
 import { connectWallet } from './utils/interact';
-import { getETHPriceInUSD } from './utils/productInteractions';
 import { formatStripeToUSDString } from './utils/format';
 
 import NFTContainer from './NFTContainer';
 
+import { getNFTData, getETHPriceInUSD } from './queries/NftData';
+
 import { Product } from './constants/class-objects';
+
+import Navbar from './components/Navbar';
+import NFTContainer from './NFTContainer';
+import PurchaseModal from './components/PurchaseModal';
 
 const Checkout:React.FC = () => {
 
@@ -21,44 +25,45 @@ const Checkout:React.FC = () => {
     quantity: 100,
   };
 
+  // Front end state vars
+  const [currentImage, setCurrentImage] = useState(testProduct.productImageUrls[0]);
+  // Wallet state vars
   const [errorMessage, setErrorMessage] = useState('');
   const [walletAddress, setWalletAddress] = useState(null);
   const [userBalance, setUserBalance] = useState('');
+  // NFT Purchase state vars
+  const [callingNfts, setCallingNfts] = useState(false);
   const [nfts, setNfts] = useState([]);
-  const [ethPrice, setETHPrice] = useState();
-  const [currentImage, setCurrentImage] = useState(testProduct.productImageUrls[0]);
+  const [ethPrice, setETHPrice] = useState(null);
+  const [isInstantBarter, setInstantBarter] = useState(false);
+  // Modal visibility
+  const [nftsVisible, setNftsVisible] = useState(false);  // When true, shows Choose NFTs Modal
+  const [selectedNft, setSelectedNft] = useState(null);   // When true, shows Purchase Modal
 
-  // const removeOverlay = () => {
-  //   document.getElementById('overlay')!.style.opacity = "0"; // added to remove overlay
-  //   document.getElementById('overlay')!.style.height = "0";
-  //   document.getElementById('overlay')!.style.width = "0";
-  //   let myContainer = document.getElementById('switching-title') as HTMLInputElement;
-  //   myContainer.innerHTML = `<h2>Checkout Product</h2>`;
+  const checkoutClicked = async (instant:boolean) => {
 
-  // }
-
-  const connectWalletCheckout = async () => {
-
-    document.getElementById('overlay')!.style.opacity = "1"; // added for overlay
-    document.getElementById('overlay')!.style.height = "80vh";
-    document.getElementById('overlay')!.style.width = "100%";
-    let myContainer = document.getElementById('switching-title') as HTMLInputElement;
-    myContainer.innerHTML = `<h2>Your NFTs</h2>` //<button className="close-btn" onClick={${() => removeOverlay}}>X</button>`;
-
+    // Connect Wallet if needed
     const resp:any = await connectWallet();
     const addr = resp.address;
-
     if (addr !== "") {
       accountChangedHandler(addr);
     } else {
       setErrorMessage(resp.status)
     }
+
+    setInstantBarter(instant);
+    setNftsVisible(true);
   }
 
-  const accountChangedHandler = (newAccount:any) => {
+  const accountChangedHandler = async (newAccount:any) => {
     setWalletAddress(newAccount);
     getUserBalance(newAccount.toString());
-    getNFTData(newAccount);
+
+    if (!callingNfts) {
+      const nftResp = await getNFTData(newAccount);
+      setCallingNfts(false);
+      setNfts(nftResp);
+    }
   }
 
   const getUserBalance = (address:any) => {
@@ -66,27 +71,6 @@ const Checkout:React.FC = () => {
       .then((balance:any) => {
           setUserBalance(ethers.utils.formatEther(balance));
       })
-  }
-
-  const getNFTData = async(address:any) => {
-
-    // TODO: Use this for production/mainnet API
-    // const options = {
-    //   method: 'GET',
-    //   headers: {Accept: 'application/json', 'X-API-KEY': ''},
-    // };
-    const options = {
-      method: 'GET',
-    };
-    
-    const response = await fetch(`https://rinkeby-api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=0&limit=20`, options);
-    const data = await response.json();
-
-    if (data === undefined || data === null) {
-      setErrorMessage(`NFTs not found`);
-    } else {
-      setNfts(data.assets);
-    }
   }
 
   const chainChangedHandler = (newChain:any) => {
@@ -115,58 +99,7 @@ const Checkout:React.FC = () => {
 
   return (
     <body>
-      <div className="whole-top">
-        <div className="top">
-          <a href="/">
-            <div>
-              <h1 className="brand">SPAMAZON</h1>
-            </div>
-          </a>
-
-          <div className="user-info">
-            <p>Wallet Address: {walletAddress}</p>
-            <p>Wallet Balance: {userBalance}</p>
-            <p>{errorMessage}</p>
-          </div>
-
-
-          <div className="right-side">
-            <a href="/productpayments">
-              <div>
-                <h2 className="productpayments">Account &amp; Payments</h2>
-              </div>
-            </a>
-
-
-            <a href="/checkout">
-              <div>
-                <h2 className="checkout">Checkout</h2>
-              </div>
-            </a>
-          </div>
-        </div>
-
-        <div className="second-top">
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-        </div>
-
-        <div className="fourth-top" id="switching-title">
-          <h2>Checkout Product</h2>
-        </div>
-      </div>
-
+      <Navbar walletAddress={walletAddress} userBalance={userBalance} errorMessage={errorMessage} />
       <div className="sell-content">
         <div className="sell-cols">
 
@@ -187,69 +120,39 @@ const Checkout:React.FC = () => {
           </div>
 
           <div className="far-right-col">
-            <button onClick={connectWalletCheckout} className="buy-btn">One-click barter</button>
+            <p style={{ textAlign: 'left' }}>{testProduct.price}</p>
+            <p style={{ textAlign: 'left' }}>FREE delivery <strong>to the Metaverse.</strong></p>
+            <button disabled={ethPrice == null} onClick={() => checkoutClicked(true)} className="buy-btn">One-click barter</button>
+            <button disabled={ethPrice == null} onClick={() => checkoutClicked(false)} className="sell-btn">Dump now, pay later</button>
           </div>
-
         </div>
-
-
+      {nftsVisible &&
         <div id="overlay">
-          {ethPrice && <div>
-            <NFTContainer nfts={nfts} product={testProduct} ethPrice={ethPrice} />
-          </div> }
-        </div>
+          <NFTContainer
+            nfts={nfts}
+            selectedNft={selectedNft}     // If present, the other Barter buttons on Cards are disabled
+            setNftsVisible={setNftsVisible}
+            setSelectedNft={setSelectedNft}
+          />
+        </div>}
+        {selectedNft &&
+        <div id="purchaseOverlay">
+          <PurchaseModal
+            selectedNft={selectedNft}
+            product={testProduct}
+            ethPrice={ethPrice}
+            isInstantBarter={isInstantBarter}
+            setSelectedNft={setSelectedNft}
+          />
+        </div>}
       </div>
-
-      {/* <div className="add-space">
-        <h2></h2>
-      </div>
-
-
-      <div className="fifth-top">
-        <h2>Your NFTs</h2>
-      </div>
-
-      {ethPrice && <div className="nft-content">
-        <NFTContainer nfts={nfts} product={testProduct} ethPrice={ethPrice} />
-      </div> } */}
 
       <div>
         <h2>Ayo? Tryna Mint?</h2>
         <h3><a href="/minter">Minter</a></h3>
       </div>
-
-        
-      
+            
     </body>
-
-
-
-
-
-
-    // <div>
-    //   <h1>Checkout product</h1>
-    //   <img alt="product-img" width="20%" src={testProduct.productImageUrls[0]} />
-    //   <h2>{testProduct.name}</h2>
-    //   <p>{testProduct.description}</p>
-    //   <p>{testProduct.price}</p>
-    //   <button onClick={connectWalletCheckout}>One-click barter</button>
-    //   <div>
-    //     <p>Address: {walletAddress}</p>
-    //   </div>
-    //   <div>
-    //     <p>Balance: { userBalance }</p>
-    //     <p>{errorMessage}</p>
-    //   </div>
-    //   <div>
-    //     <h2>Ayo? Tryna Mint?</h2>
-    //     <h3><a href="/minter">Minter</a></h3>
-    //   </div>
-    //   <div>
-    //     <h2>Your NFTs</h2>
-    //     <NFTContainer nfts={nfts} />
-    //   </div>
-    // </div>
   );
 }
 

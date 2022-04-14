@@ -1,3 +1,11 @@
+/**
+ * 
+ * @returns current time timestamp
+ */
+export function getCurrentTimestamp() {
+  return (Math.round((new Date()).getTime() / 1000));
+}
+
 export const formatStripeToUSDString = (stripeInt:number) => {
   const decPlaces = 2;
   const decSep = ".";
