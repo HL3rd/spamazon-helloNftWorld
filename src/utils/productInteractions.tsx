@@ -1,5 +1,7 @@
 import { Product } from '../constants/class-objects';
 import { ethers } from 'ethers';
+import { db, FieldValue } from '../utils/firebase';
+import { getCurrentTimestamp } from '../utils/format';
 
 const BARTER_CONTRACT_ADDRESS = "0xc24afecb277Dd2f5b50b5B51f1fC9d5b8234101A";
 const barterContractInfo = require('../artifacts/Barter.json');
@@ -14,20 +16,6 @@ declare var window: any;
 
 /**
  * 
- * @returns ETH price in USD
- * 
- */
-export const getETHPriceInUSD = async () => {
-  const options = {
-    method: 'GET',
-  };
-  const resp = await fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD', options);
-  const data = await resp.json();
-  return data.USD;
-}
-
-/**
- * 
  * @param nft 
  * @returns 
  * 
@@ -35,6 +23,9 @@ export const getETHPriceInUSD = async () => {
  * Then calls ethe OpenSea API with the slug to collect floor_price
  * 
  */
+
+const delay = (ms:number) => new Promise(res => setTimeout(res, ms));
+
 const openSeaCollectionFloorPrice = async (nft:any) => {
   const options = {
     method: 'GET'
@@ -47,6 +38,8 @@ const openSeaCollectionFloorPrice = async (nft:any) => {
   const slug = assetData.collection.slug;
 
   console.log(`SLUG: ${slug}`);
+
+  await delay(2000);
 
   // Use collection slug to query proper eth floor price
   const collectionResp = await fetch(`https://testnets-api.opensea.io/api/v1/collection/${slug}/stats`, options);
@@ -74,16 +67,20 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
   
   console.log(`FINAL ETH PRICE AT PURCASE CHECK : ${ethPrice}`);
 
-  // TODO: Place this call for ETH USD Price in Checkout page
   const floorPriceETH = await openSeaCollectionFloorPrice(nft);
   const floorPriceUSD = floorPriceETH * ethPrice;
+  // const floorPriceUSD = 100000;
   const prodPriceUSD = product.price / 100;
+
+  console.log(`GOT THIS FLOOR PRICE: ${floorPriceETH} = ${floorPriceUSD}`)
 
   if (floorPriceUSD > prodPriceUSD) {
     // Execute transfer
     console.log(`Can execute the trade!`);
     return {
       success: true,
+      floorPriceETH,
+      floorPriceUSD,
       status: `About to transfer dis NFT`
     }
   } else {
@@ -91,6 +88,8 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
     console.log(`Insufficient market value`);
     return {
       success: false,
+      floorPriceETH,
+      floorPriceUSD,
       status: `Insufficient market value: the floor price of this NFT (${floorPriceETH}ETH , $${floorPriceUSD}) is not enough to barter with this product (${prodPriceUSD})`
     }
   }
@@ -104,7 +103,7 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
  * Function triggers transfer of NFT from buyer wallet to store wallet
  * 
  */
- export const exchangeNFT = async (nft:any) => {
+ export const instantBarterNFT = async (nft:any) => {
 
   const buyerAddr = window.ethereum.selectedAddress;
 
@@ -144,7 +143,7 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
   } catch (error) {
 
     return {
-      successs: false,
+      success: false,
       status: `An error occurred while exchanging your NFT: ${error}`
     }
 
@@ -176,9 +175,9 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
     await provider.send("eth_requestAccounts", []);
     const signer = provider.getSigner();
 
-    const testItemValueETH = (product.price / 100) / ethPrice;
-    const testItemValueWei = ethers.utils.parseEther(`${testItemValueETH}`);
-    console.log( `Item value in wei = ${testItemValueWei}`);
+    const itemValueETH = (product.price / 100) / ethPrice;
+    const itemValueWei = ethers.utils.parseEther(`${itemValueETH}`);
+    console.log( `Item value in wei = ${itemValueWei}`);
 
     const nftContractAddr = nft.asset_contract.address; // NFT contract address
     const nftTokenId = nft.token_id; // NFT token id
@@ -191,8 +190,6 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
 
     // Barter contract instance
     const barterContract = new ethers.Contract(BARTER_CONTRACT_ADDRESS, barterContractInfo.abi, signer);
-
-    // TODO ADD FIRESTORE CREATION FUNCTION HERE AND TRIGGER AT SAME TIME
     
     // Barter.sol, now approved, trigger the NFT exchange
     const tx_2 = await barterContract.collateralizedPurchase(
@@ -200,12 +197,14 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
       STORE_WALLET_ADDRESS,
       nftContractAddr,
       nftTokenId,
-      testItemValueWei,
+      itemValueWei,
       {
         from: buyerAddr,
         gasLimit: 8000000
       }
     );
+
+    setOutstandingBalanceDoc(nft, product, ethPrice, signer);
 
     return {
       success: true,
@@ -219,6 +218,49 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
     }
   }
 }
+
+/**
+ * 
+ * @param nft 
+ * @param product 
+ * @param ethPrice 
+ * @param signer 
+ * 
+ * Function writes the transaction above to a Firestore document for tracking
+ * 
+ */
+export const setOutstandingBalanceDoc = async (nft:any, product:Product, ethPrice:any, signer:ethers.providers.JsonRpcSigner) => {
+
+  const walletAddress = await signer.getAddress();
+  const currTimestamp = getCurrentTimestamp();
+
+  const productPriceEth = (product.price / 100) / ethPrice;
+
+  const newOutstandingDocRef = db.collection("outstandingNftBalance").doc();
+
+  const nftBalanceData = {
+    balanceRemaining: productPriceEth,
+    balanceStart: productPriceEth,
+    buyerAddress: walletAddress,
+    createdAt: currTimestamp,
+    id: newOutstandingDocRef.id,
+    nftContractAddress: nft.asset_contract.address,
+    nftTokenId: nft.token_id,
+    product: {
+      description: product.description,
+      id: product.id,
+      isListed: product.isListed,
+      name: product.name,
+      price: product.price,
+      productImageUrls: product.productImageUrls,
+      quantity: product.quantity,
+    },
+    sellerAddress: STORE_WALLET_ADDRESS,
+  }
+  newOutstandingDocRef.set(nftBalanceData, { merge: true })
+    .then(() => { })
+    .catch((err:Error) => { })
+};
 
 /**
  * 
@@ -285,3 +327,23 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
 
   }
 }
+
+/**
+ * 
+ * @param nft 
+ * @param product 
+ * @param ethPrice 
+ * @param signer 
+ * 
+ * Function decrements balance remaining on the outstanding balance
+ * 
+ */
+ export const updateAndPayOutstandingBalance = async (paymentEth:any, docId:string) => {
+
+  db.collection("outstandingNftBalance").doc(docId)
+    .update({
+      balanceRemaining: FieldValue.increment(-paymentEth),
+     })
+    .then(() => { })
+    .catch((err:Error) => { })
+};
