@@ -1,22 +1,17 @@
 import firebase from "firebase/app";
+import "firebase/firestore";
+import "firebase/functions";
 
-function getFirebaseConfig() {
+const config = {
+  apiKey: `${process.env.REACT_APP_FIREBASE_API_KEY}`,
+  authDomain: `${process.env.REACT_APP_FIREBASE_AUTH_DOMAIN}`,
+  projectId: `${process.env.REACT_APP_FIREBASE_PROJECT_ID}`,
+  storageBucket: `${process.env.REACT_APP_FIREBASE_STORAGE_BUCKET}`,
+  messagingSenderId: `${process.env.REACT_APP_FIREBASE_MESSAGE_SENDER_ID}`,
+  appId: `${process.env.REACT_APP_FIREBASE_APP_ID}`
+};
 
-  const firebaseDevConfig = {
-    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-    authDomain: `${process.env.REACT_APP_FIREBASE_AUTH_DOMAIN}`,
-    projectId: `${process.env.REACT_APP_FIREBASE_PROJECT_ID}`,
-    storageBucket: `${process.env.REACT_APP_FIREBASE_STORAGE_BUCKET}`,
-    messagingSenderId: `${process.env.REACT_APP_FIREBASE_MESSAGE_SENDER_ID}`,
-    appId: `${process.env.REACT_APP_FIREBASE_APP_ID}`
-  };
-  
-  return firebaseDevConfig;
-}
+const app = firebase.initializeApp(config);
 
-const config = getFirebaseConfig();
-if (!firebase.apps.length) {
-  firebase.initializeApp(config);
-} else {
-  firebase.app(); // if already initialized, use that one
-}
+export const db = app.firestore();
+export const FieldValue = firebase.firestore.FieldValue;
