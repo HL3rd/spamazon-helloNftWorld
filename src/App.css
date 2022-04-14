@@ -547,6 +547,7 @@ a:hover {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+}
 
 .nft-card-img {
   height: 45%;
