@@ -1,8 +1,20 @@
 import React from 'react';
 import './Home.css'
 import Navbar from './components/Navbar';
+import { Product } from './constants/class-objects';
 
 const Home = () => {
+  const testProduct:Product = {
+    description: 'A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product',
+    productImageUrls: ['https://images-na.ssl-images-amazon.com/images/I/91TvWl33h4L.jpg', "https://i.kym-cdn.com/entries/icons/mobile/000/006/026/NOTSUREIF.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Giraffa_camelopardalis_angolensis.jpg/1024px-Giraffa_camelopardalis_angolensis.jpg"],
+    id: '00000',
+    isListed: true,
+    name: 'Guide to the Universe Book',
+    price: 10000,
+    quantity: 100,
+  };
+
+
   return (
     <body>
       <Navbar walletAddress={"a"} userBalance={"a"} errorMessage={"a"} /> 
@@ -23,7 +35,7 @@ const Home = () => {
           <div className="home-box">
             <h4>Trending Apparel</h4>
             <div className="box-image">
-              <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fspam_costume.png?alt=media&token=70beb50b-9a28-42f2-bbfa-c7c2ecb1ed9e"/>
+              <img className="box-image-link" src={testProduct.productImageUrls[0]}/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
