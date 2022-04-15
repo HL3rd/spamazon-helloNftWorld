@@ -15,8 +15,8 @@ const ProductPayments: React.FC = () => {
   const [outstandingNftBlance, setOutstandingNftBalance] = useState<OutstandingNftBalance|null>(null);
 
   const testOutstandingNftBalance: OutstandingNftBalance = {
-    amountOwed: 1.0,
-    amountOwedStart: 2.0,
+    balanceRemaining: 1.0,
+    balanceStart: 2.0,
     buyerAddress: "0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6",
     createdAt: 1649908881,
     id: "00000",

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Product } from './constants/class-objects';
 import { formatShortenContract } from './utils/format';
-import { db, FieldValue } from './utils/firebase';
 import { Row, Col } from 'react-bootstrap';
 
 interface NFTCardProps {
