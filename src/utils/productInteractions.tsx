@@ -2,6 +2,7 @@ import { Product } from '../constants/class-objects';
 import { ethers } from 'ethers';
 import { db, FieldValue } from '../utils/firebase';
 import { getCurrentTimestamp } from '../utils/format';
+import { openSeaCollectionFloorPrice } from '../queries/NftData';
 
 const BARTER_CONTRACT_ADDRESS = "0xc24afecb277Dd2f5b50b5B51f1fC9d5b8234101A";
 const barterContractInfo = require('../artifacts/Barter.json');
@@ -17,44 +18,6 @@ declare var window: any;
 /**
  * 
  * @param nft 
- * @returns 
- * 
- * Calls the OpenSea API to retrieve NFT collection slug
- * Then calls ethe OpenSea API with the slug to collect floor_price
- * 
- */
-
-const delay = (ms:number) => new Promise(res => setTimeout(res, ms));
-
-const openSeaCollectionFloorPrice = async (nft:any) => {
-  const options = {
-    method: 'GET'
-  };
-
-  // Query the asset to retrieve slug
-  const assetResp = await fetch(`https://testnets-api.opensea.io/api/v1/asset/${nft.asset_contract.address}/${nft.token_id}/`, options)
-  const assetData = await assetResp.json();
-
-  const slug = assetData.collection.slug;
-
-  console.log(`SLUG: ${slug}`);
-
-  await delay(2000);
-
-  // Use collection slug to query proper eth floor price
-  const collectionResp = await fetch(`https://testnets-api.opensea.io/api/v1/collection/${slug}/stats`, options);
-  const collectionData = await collectionResp.json();
-
-  console.log(`Got back this data from OpenSea: ${JSON.stringify(collectionData)}`);
-
-  const floorPrice = collectionData.stats ? collectionData.stats.floor_price : 0;
-  
-  return floorPrice;
-}
-
-/**
- * 
- * @param nft 
  * @param product 
  * @param ethPrice 
  * @returns 
@@ -65,7 +28,7 @@ const openSeaCollectionFloorPrice = async (nft:any) => {
  */
 export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) => {
   
-  console.log(`FINAL ETH PRICE AT PURCASE CHECK : ${ethPrice}`);
+  console.log(`FINAL ETH PRICE AT PURCHASE CHECK : ${ethPrice}`);
 
   const floorPriceETH = await openSeaCollectionFloorPrice(nft);
   const floorPriceUSD = floorPriceETH * ethPrice;
@@ -213,7 +176,7 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
 
   } catch (error) {
     return {
-      successs: false,
+      success: false,
       status: `An error occurred while exchanging your NFT: ${error}`
     }
   }
