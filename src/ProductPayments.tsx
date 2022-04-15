@@ -5,7 +5,7 @@ import { OutstandingNftBalance } from './constants/class-objects';
 
 import { queryOutstandingNftBalances } from './queries/FirebaseQueries';
 import { connectWallet } from './utils/interact';
-import { repayStore } from './utils/productInteractions';
+import { repayStore, getExactPaymentleft } from './utils/productInteractions';
 
 import './App.css';
 import { ProgressBar } from 'react-bootstrap';
@@ -88,10 +88,16 @@ const ProductPayments: React.FC = () => {
   }
 
   // Pay this outstanding object
-  const triggeredPaymentToOutstandingBalance = async () => {
+  const triggeredPaymentToOutstandingBalance = async (event:any) => {
 
-    
-    
+    event.preventDefault();
+
+    const amountPaid = event.target[0].value;
+    console.log(`PAYINH:::::: ${amountPaid}`);
+
+    const exactAmount = await getExactPaymentleft("0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6", currentOustandingBalance!.nftContractAddress, currentOustandingBalance!.nftTokenId);
+
+    await repayStore(currentOustandingBalance!.nftContractAddress, currentOustandingBalance!.nftTokenId, exactAmount);
 
   }
 
@@ -190,7 +196,7 @@ const ProductPayments: React.FC = () => {
                     />
                   </div>
 
-                  <form className="form-input" onSubmit={() => triggeredPaymentToOutstandingBalance()}>
+                  <form className="form-input" onSubmit={(e:any) => triggeredPaymentToOutstandingBalance(e)}>
                     <p className="selected-amount-input">Amount to Pay:</p>
                     <input
                       type="text"

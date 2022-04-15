@@ -233,7 +233,7 @@ export const setOutstandingBalanceDoc = async (nft:any, product:Product, ethPric
  * Function allows user to repay in WETH to receive NFT again
  * 
  */
- export const repayStore = async (nft:any, paymentInETH:any) => {
+ export const repayStore = async (nftContractAddress:string, nftTokenId:any, paymentInETH:any) => {
 
   const buyerAddr = window.ethereum.selectedAddress;
 
@@ -249,8 +249,8 @@ export const setOutstandingBalanceDoc = async (nft:any, product:Product, ethPric
     await provider.send("eth_requestAccounts", []);
     const signer = provider.getSigner();
 
-    const nftContractAddr = nft.asset_contract.address; // NFT contract address
-    const nftTokenId = nft.token_id; // NFT token id
+    const nftContractAddr = nftContractAddress; // NFT contract address
+    const nftToken = nftTokenId; // NFT token id
 
     const paymentInWei = ethers.utils.parseEther(`${paymentInETH}`);
     console.log( `Item value in wei = ${paymentInWei}`);
@@ -269,7 +269,7 @@ export const setOutstandingBalanceDoc = async (nft:any, product:Product, ethPric
     const transferTx = await barterContract.repay(
       buyerAddr,
       nftContractAddr,
-      nftTokenId,
+      nftToken,
       paymentInWei,
       { from: buyerAddr, gasLimit: 9000000 }
     );
@@ -278,7 +278,7 @@ export const setOutstandingBalanceDoc = async (nft:any, product:Product, ethPric
 
     return {
       success: true,
-      status: `Hash: ${transferTx.hash} \n Successfully transferred NFT ${nftContractAddr} with tokenId ${nftTokenId} to ${BARTER_CONTRACT_ADDRESS}`
+      status: `Hash: ${transferTx.hash} \n Successfully transferred NFT ${nftContractAddr} with tokenId ${nftToken} to ${BARTER_CONTRACT_ADDRESS}`
     }
 
   } catch (error) {
@@ -310,3 +310,31 @@ export const setOutstandingBalanceDoc = async (nft:any, product:Product, ethPric
     .then(() => { })
     .catch((err:Error) => { })
 };
+
+
+export const getExactPaymentleft = async (wallet:string, nftContract: any, nftToken:any) => {
+
+  const BUYER_ADDRESS = wallet;
+  const NFT_CONTRACT_ADDRESS = nftContract;
+  const TOKEN_ID = nftToken;
+
+  // contract instance
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  const signer = provider.getSigner();
+
+
+  // Barter contract instance
+  const barterContract = new ethers.Contract(BARTER_CONTRACT_ADDRESS, barterContractInfo.abi, signer);
+
+  // Barter.sol, now approved, trigger the WETH transfer
+  const amountInWei = await barterContract.valueBorrowedOneNFT(
+    BUYER_ADDRESS,
+    NFT_CONTRACT_ADDRESS,
+    TOKEN_ID,
+  );
+
+  return ethers.utils.formatEther(amountInWei);
+  
+
+}
