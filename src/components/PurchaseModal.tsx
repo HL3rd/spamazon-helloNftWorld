@@ -16,21 +16,11 @@ const PurchaseModal:React.FC<PurchaseModalProps> = ({ selectedNft, product, ethP
 
     const [status, setStatus] = useState("");
 
-    // Item trades the nft and sets outstanding bartering value
-    const executeCollateralizedPurchase = async (nft:any, product:Product, ethPrice:any) => {
-      const collateralResp = await collateralizeNFT(nft, product, ethPrice);
-      setStatus(collateralResp.status);
-      setSelectedNft(null);
-
-      // TODO: Refresh NFTs
-    };
-
     /**
      * Mini component for Instant Barter checkout
      * @returns 
      */
     const instantBarterCheckout = () => {
-
       const [checkingMarketValue, setCheckingMarketValue] = useState(false);
       const [marketValueETH, setMarketValueETH] = useState(0);
       const [marketValueUSD, setMarketValueUSD] = useState(0);
@@ -44,7 +34,7 @@ const PurchaseModal:React.FC<PurchaseModalProps> = ({ selectedNft, product, ethP
         const checkResp = await canPurchaseCheck(selectedNft, product, ethPrice);
         setCheckingMarketValue(false);
 
-        setCanPurchase(checkResp.floorPriceUSD > (product.price / 100))
+        setCanPurchase(checkResp.floorPriceUSD > (product.price / 100));
 
         setMarketValueETH(checkResp.floorPriceETH);
         setMarketValueUSD(checkResp.floorPriceUSD);
@@ -62,10 +52,15 @@ const PurchaseModal:React.FC<PurchaseModalProps> = ({ selectedNft, product, ethP
             
             <Row>
               <Col>
-                { canPurchase == null && <button onClick={() => checkMarketValue()}>Check Market Value</button> }
+                { canPurchase == null &&
+                <div>
+                  <p>Automatically trade your {selectedNft.name} NFT for {product.name} if the current market value is higher.</p>
+                  <button disabled={checkingMarketValue} onClick={() => checkMarketValue()}>Check Market Value</button>
+                </div>
+                }
                 { canPurchase != null && canPurchase && !continueTapped &&
                   <div>
-                    <h3>Yay! Your NFT is valued at:</h3>
+                    <h3>Yay! Your Discord mods must be doing great work. Your NFT floor price is at:</h3>
                     <h3>{marketValueETH} ETH or ${marketValueUSD}</h3>
                     <button onClick={() => setContinueTapped(true)}>Continue</button>
                     <button onClick={() => setSelectedNft(null)}>Cancel</button>
@@ -92,7 +87,7 @@ const PurchaseModal:React.FC<PurchaseModalProps> = ({ selectedNft, product, ethP
                   <div>
                     <h3>Yay!</h3>
                     <p>You succesfull traded in your {selectedNft.name} NFT for {product.name} </p>
-                    <button onClick={() => window.open("/", "_blank")}>Continue Shopping</button>
+                    <a href="/">Continue Shopping</a>
                   </div>
                 }
               </Col>
@@ -107,11 +102,82 @@ const PurchaseModal:React.FC<PurchaseModalProps> = ({ selectedNft, product, ethP
      * @returns 
      */
     const collateralBarterCheckout = () => {
+      
+      const [checkingMarketValue, setCheckingMarketValue] = useState(false);
+      const [marketValueETH, setMarketValueETH] = useState(0);
+      const [marketValueUSD, setMarketValueUSD] = useState(0);
+      const [canPurchase, setCanPurchase] = useState<boolean|null>(null);
+      const [continueTapped, setContinueTapped] = useState(false);
+      const [exchangeStatus, setExchangeStatus] = useState<boolean|null>(null);
+
+      const checkMarketValue = async () => {
+
+        setCheckingMarketValue(true);
+        const checkResp = await canPurchaseCheck(selectedNft, product, ethPrice);
+        setCheckingMarketValue(false);
+
+        setCanPurchase(checkResp.floorPriceUSD > 0)
+
+        setMarketValueETH(checkResp.floorPriceETH);
+        setMarketValueUSD(checkResp.floorPriceUSD);
+      }
+
+        // Item trades the nft and sets outstanding bartering value
+      const executeCollateralizedPurchase = async (nft:any, product:Product, ethPrice:any) => {
+        const collateralResp = await collateralizeNFT(nft, product, ethPrice);
+        setExchangeStatus(collateralResp.success);
+      };
+
       return (
         <Row>
           <Col>
-            <h3>Collateralized Purchase</h3>
-            <p>Buy {product.name} now, pay later after posting your {selectedNft.name} NFT up for collateral.</p>
+            <Row>
+              <Col>
+                { canPurchase == null &&
+                  <div>
+                    <p>Put up your {selectedNft.name} NFT as collateral to buy {product.name} if the current market value is higher.</p>
+                    <p>Pay off the balance in WETH later.</p>
+                    <p>Floor price must be non-zero to collateralize.</p>
+                    <button disabled={checkingMarketValue} onClick={() => checkMarketValue()}>Check Market Value</button>
+                  </div>
+                }
+                { canPurchase != null && canPurchase && !continueTapped &&
+                  <div>
+                    <h3>Yay! Your Discord mods must be doing great work. Your NFT's floor price is:</h3>
+                    <h3>{marketValueETH} ETH or ${marketValueUSD}</h3>
+                    <button onClick={() => setContinueTapped(true)}>Continue</button>
+                    <button onClick={() => setSelectedNft(null)}>Cancel</button>
+                  </div>
+                }
+                { canPurchase != null && !canPurchase &&
+                  <div>
+                    <h3>Sorry, there's no market for your NFT. The floor price is 0 ETH</h3>
+                    <p>Better ask your Discord to pump your bags before buying {product.name}</p>
+                    <button onClick={() => setSelectedNft(null)}>Back</button> 
+                  </div>
+                }
+                { canPurchase != null && continueTapped && exchangeStatus == null &&
+                  <div>
+                    <h3>Confirm Purchase</h3>
+                    <p>Click 'Confirm Exchange' in order to post your NFT as collateral to pay for {product.name} later.</p>
+                    <p>This means you will have to pay {(product.price / 100) / ethPrice} WETH within 30 days to get your NFT back.</p>
+                    <button onClick={() => executeCollateralizedPurchase(selectedNft, product, ethPrice)}>Confirm Exchange</button>
+                    <button onClick={() => setSelectedNft(null)}>Cancel</button>
+                    { exchangeStatus !== null && !exchangeStatus && <p>Oops! Something went wrong</p>}
+                  </div>
+                }
+                {
+                  canPurchase !== null && continueTapped && exchangeStatus &&
+                  <div>
+                    <h3>Yay!</h3>
+                    <p>You succesfully posted your {selectedNft.name} NFT as collateral for {product.name} </p>
+                    <a href="/">Continue Shopping</a>
+                    <p>Remember to pay in full within 30 days or risk loosing your {selectedNft.name} forever!</p>
+                    <a href="/payments">Make a Payment</a>
+                  </div>
+                }
+              </Col>
+            </Row>
           </Col>
         </Row>
       )
@@ -119,24 +185,21 @@ const PurchaseModal:React.FC<PurchaseModalProps> = ({ selectedNft, product, ethP
 
     return (
       <Row className="purchaseModal">
-        <div style={{ textAlign: 'left', alignItems: 'left', marginLeft: '20px' }}>
-          <button onClick={() => setSelectedNft(null)}>
-            X
-          </button>
-        </div>
         <Col xs={5}>
+          <div style={{ textAlign: 'left', alignItems: 'left', marginLeft: '20px' }}>
+            <button onClick={() => setSelectedNft(null)}>
+              X
+            </button>
+          </div>
           { isInstantBarter &&
-            <div>
+            <div className="checkout-left-col">
               <h3>Instant Trade-In Purchase</h3>
-              <p>Automatically trade your {selectedNft.name} NFT for {product.name} if the current market value is higher.</p>
               <img alt={`${selectedNft.name}`} className="nft-barter-img" src={selectedNft.image_url}/>
             </div>
           }
           { !isInstantBarter &&
-            <div>
+            <div className="checkout-left-col">
               <h3>Dump now, Pay later</h3>
-              <p>Put up your {selectedNft.name} NFT as collateral to buy {product.name} if the current market value is higher.</p>
-              <p>Pay off the balance in WETH later.</p>
               <img alt={`${selectedNft.name}`} className="nft-barter-img" src={selectedNft.image_url}/>
             </div>
           }
