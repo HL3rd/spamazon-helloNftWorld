@@ -79,6 +79,6 @@ export const getNFTData = async (address:any) => {
    } catch (err:any) {
  
      console.error(err);
-     return 0;
+     return 1;
    }
  }
