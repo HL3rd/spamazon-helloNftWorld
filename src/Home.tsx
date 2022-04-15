@@ -35,7 +35,7 @@ const Home = () => {
           <div className="home-box">
             <h4>Trending Apparel</h4>
             <div className="box-image">
-              <img className="box-image-link" src={testProduct.productImageUrls[0]}/>
+              <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fspam_costume.png?alt=media&token=70beb50b-9a28-42f2-bbfa-c7c2ecb1ed9e"/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
@@ -71,15 +71,15 @@ const Home = () => {
           <div className="home-box">
             <h4>Deal Of The Day</h4>
             <div className="box-image">
-              <img className="box-image-link" src=""/>
+              <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2FGroup%201.png?alt=media&token=057e2b8b-1e88-485d-b87d-cdf732d9a004"/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
 
           <div className="home-box">
-            <h4>Inspired By Your Purchases</h4>
+            <h4>Brooms For Sweeping Any Floor</h4>
             <div className="box-image">
-              <img className="box-image-link" src=""/>
+              <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fbroom2%201.png?alt=media&token=6cb36cbf-fb39-4fb0-8477-2b9b47d31674"/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
@@ -87,7 +87,7 @@ const Home = () => {
           <div className="home-box">
             <h4>Keep Shopping For</h4>
             <div className="box-image">
-              <img className="box-image-link" src=""/>
+              <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fmutant%201.png?alt=media&token=51b60c8a-e7f9-4e49-9443-5eedd0eb29ce"/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
