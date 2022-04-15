@@ -44,47 +44,47 @@ const CollateralBarterCheckout:React.FC<CollateralBarterCheckoutProps> = ({ sele
         <Row>
           <Col>
             { canPurchase == null &&
-              <div>
-                <p>Put up your {selectedNft.name} NFT as collateral to buy {product.name} if the current market value is higher.</p>
-                <p>Pay off the balance in WETH later.</p>
-                <p>Floor price must be non-zero to collateralize.</p>
-                <button disabled={checkingMarketValue} onClick={() => checkMarketValue()}>Check Market Value</button>
+              <div className="first-step">
+                <p className="put-up">Put up your {selectedNft.name} NFT as collateral to buy {product.name} if the current market value is higher.</p>
+                <p className="pay-off">Pay off the balance in WETH later.</p>
+                <p className="pay-off-floor">Floor price must be non-zero to collateralize.</p>
+                <button className="market-btn" disabled={checkingMarketValue} onClick={() => checkMarketValue()}>Check Market Value</button>
               </div>
             }
             { canPurchase != null && canPurchase && !continueTapped &&
-              <div>
-                <h3>Yay! Your Discord mods must be doing great work. Your NFT's floor price is:</h3>
-                <h3>{marketValueETH} ETH or ${marketValueUSD}</h3>
-                <button onClick={() => setContinueTapped(true)}>Continue</button>
-                <button onClick={() => setSelectedNft(null)}>Cancel</button>
+              <div className="first-step">
+                <h3 className="floor-price">Yay! Your Discord mods must be doing great work. Your NFT's floor price is:</h3>
+                <h3 className="floor-eth">{marketValueETH} ETH = ${marketValueUSD}</h3>
+                <button className="market-btn" onClick={() => setContinueTapped(true)}>Continue</button>
+                <button className="cancel-btn" onClick={() => setSelectedNft(null)}>Cancel</button>
               </div>
             }
             { canPurchase != null && !canPurchase &&
-              <div>
-                <h3>Sorry, there's no market for your NFT. The floor price is 0 ETH</h3>
-                <p>Better ask your Discord to pump your bags before buying {product.name}</p>
-                <button onClick={() => setSelectedNft(null)}>Back</button> 
+              <div className="first-step">
+                <h3 className="floor-price">Sorry, there's no market for your NFT. The floor price is 0 ETH</h3>
+                <p className="better-ask">Better ask your Discord to pump your bags before buying {product.name}</p>
+                <button className="cancel-btn" onClick={() => setSelectedNft(null)}>Back</button> 
               </div>
             }
             { canPurchase != null && continueTapped && exchangeStatus == null &&
-              <div>
-                <h3>Confirm Purchase</h3>
-                <p>Click 'Confirm Exchange' in order to post your NFT as collateral to pay for {product.name} later.</p>
-                <p>This means you will have to pay {(product.price / 100) / ethPrice} WETH within 30 days to get your NFT back.</p>
-                <button onClick={() => executeCollateralizedPurchase(selectedNft, product, ethPrice)}>Confirm Exchange</button>
-                <button onClick={() => setSelectedNft(null)}>Cancel</button>
+              <div className="first-step">
+                <h3 className="floor-price">Confirm Purchase</h3>
+                <p className="confirm-exchange">Click 'Confirm Exchange' in order to post your NFT as collateral to pay for {product.name} later.</p>
+                <p className="confirm-exchange-extra">This means you will have to pay {(product.price / 100) / ethPrice} WETH within 30 days to get your NFT back.</p>
+                <button className="market-btn" onClick={() => executeCollateralizedPurchase(selectedNft, product, ethPrice)}>Confirm Exchange</button>
+                <button className="cancel-btn" onClick={() => setSelectedNft(null)}>Cancel</button>
                 { exchangeStatus !== null && !exchangeStatus && <p>Oops! Something went wrong</p>}
               </div>
             }
             {
-              canPurchase !== null && continueTapped && exchangeStatus &&
-              <div>
-                <h3>Success</h3>
-                <p>You succesfully posted your <strong>{selectedNft.name}</strong> NFT as collateral for {product.name} </p>
-                <img alt={product.name} src={product.productImageUrls[0]} />
-                <a href="/">Continue Shopping</a>
-                <p>Remember to pay in full within 30 days or risk loosing your {selectedNft.name} forever!</p>
-                <a href="/payments">Make a Payment</a>
+              canPurchase !== null && continueTapped && exchangeStatus && 
+              <div className="first-step">
+                <h3 className="floor-price">Success!</h3>
+                <p className="confirm-exchange">You succesfully posted your <strong>{selectedNft.name}</strong> NFT as collateral for {product.name}! </p>
+                {/* <img alt={product.name} src={product.productImageUrls[0]} /> */}
+                <a className="continue-shopping" href="/">Continue Shopping</a>
+                <p className="remember">Remember to pay in full within 30 days or risk loosing your {selectedNft.name} forever!</p>
+                <a className="make-payment" href="/payments">Make a Payment</a>
               </div>
             }
           </Col>

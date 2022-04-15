@@ -45,41 +45,41 @@ const InstantBarterCheckout:React.FC<InstantBarterCheckoutProps> = ({ selectedNf
         <Row>
           <Col>
             { canPurchase == null &&
-            <div>
-              <p>Automatically trade your {selectedNft.name} NFT for {product.name} if the current market value is higher.</p>
-              <button disabled={checkingMarketValue} onClick={() => checkMarketValue()}>Check Market Value</button>
+            <div className="first-step">
+              <p className="auto-trade">Automatically trade your {selectedNft.name} NFT for {product.name} if the current market value is higher!</p>
+              <button className="market-btn" disabled={checkingMarketValue} onClick={() => checkMarketValue()}>Check Market Value</button>
             </div>
             }
             { canPurchase != null && canPurchase && !continueTapped &&
-              <div>
-                <h3>Yay! Your Discord mods must be doing great work. Your NFT floor price is at:</h3>
-                <h3>{marketValueETH} ETH or ${marketValueUSD}</h3>
-                <button onClick={() => setContinueTapped(true)}>Continue</button>
-                <button onClick={() => setSelectedNft(null)}>Cancel</button>
+              <div className="first-step">
+                <h3 className="floor-price">Yay! Your Discord mods must be doing great work. Your NFT floor price is at:</h3>
+                <h3 className="floor-eth">{marketValueETH} ETH = ${marketValueUSD}</h3>
+                <button className="market-btn" onClick={() => setContinueTapped(true)}>Continue</button>
+                <button className="cancel-btn" onClick={() => setSelectedNft(null)}>Cancel</button>
               </div>
             }
             { canPurchase != null && !canPurchase &&
-              <div>
-                <h3>Your NFT is valued at:</h3>
-                <h3>{marketValueETH} or {marketValueUSD}</h3>
-                <p>Unfortunately, you cannot purchase {product.name} yet.</p>
-                <button onClick={() => setSelectedNft(null)}>Back</button> 
+              <div className="first-step">
+                <h3 className="floor-price">Your NFT is valued at:</h3>
+                <h3 className="prices">{marketValueETH} ETH</h3>
+                <p className="unfortunately">Unfortunately, you cannot purchase {product.name} yet.</p>
+                <button className="cancel-btn" onClick={() => setSelectedNft(null)}>Back</button> 
               </div>
             }
             { canPurchase != null && continueTapped && exchangeStatus == null &&
-              <div>
-                <h3>Confirm Purchase</h3>
-                <p>Click 'Confirm Barter' in order to trade your NFT</p>
-                <button onClick={() => executeInstantBarter(selectedNft)}>Confirm Barter</button>
+              <div className="first-step">
+                <h3 className="floor-price">Confirm Purchase</h3>
+                <p>Click 'Confirm Barter' in order to trade your NFT!</p>
+                <button className="confirm-btn" onClick={() => executeInstantBarter(selectedNft)}>Confirm Barter</button>
                 { exchangeStatus !== null && !exchangeStatus && <p>Oops! Something went wrong</p>}
               </div>
             }
             {
               canPurchase !== null && continueTapped && exchangeStatus &&
-              <div>
-                <h3>Yay!</h3>
-                <p>You succesfull traded in your {selectedNft.name} NFT for {product.name} </p>
-                <a href="/">Continue Shopping</a>
+              <div className="first-step">
+                <h3 className="floor-price">Yay!</h3>
+                <p>You succesfull traded in your {selectedNft.name} NFT for {product.name}! </p>
+                <a className="continue-shopping" href="/">Continue Shopping</a>
               </div>
             }
           </Col>

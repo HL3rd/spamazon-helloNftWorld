@@ -145,10 +145,10 @@ const Checkout:React.FC = () => {
         </div>}
       </div>
 
-      <div>
+      {/* <div>
         <h2>Ayo? Tryna Mint?</h2>
         <h3><a href="/minter">Minter</a></h3>
-      </div>
+      </div> */}
             
     </body>
   );

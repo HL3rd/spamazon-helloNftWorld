@@ -23,7 +23,7 @@ const Navbar:React.FC<NavbarProps> = ({ walletAddress, userBalance, errorMessage
       </div>
 
       <div className="right-side">
-        <a href="/productpayments">
+        <a href="/payments">
           <div>
             <h2 className="productpayments">Account &amp; Payments</h2>
           </div>
