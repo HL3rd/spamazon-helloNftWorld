@@ -169,8 +169,9 @@ const PurchaseModal:React.FC<PurchaseModalProps> = ({ selectedNft, product, ethP
                 {
                   canPurchase !== null && continueTapped && exchangeStatus &&
                   <div>
-                    <h3>Yay!</h3>
-                    <p>You succesfully posted your {selectedNft.name} NFT as collateral for {product.name} </p>
+                    <h3>Success</h3>
+                    <p>You succesfully posted your <strong>{selectedNft.name}</strong> NFT as collateral for {product.name} </p>
+                    <img alt={product.name} src={product.productImageUrls[0]} />
                     <a href="/">Continue Shopping</a>
                     <p>Remember to pay in full within 30 days or risk loosing your {selectedNft.name} forever!</p>
                     <a href="/payments">Make a Payment</a>
