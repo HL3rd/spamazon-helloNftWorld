@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Product } from './constants/class-objects';
 import { formatShortenContract } from './utils/format';
-import { db, FieldValue } from './utils/firebase';
 import { Row, Col } from 'react-bootstrap';
 
 interface NFTCardProps {
@@ -20,8 +19,6 @@ const NFTCard:React.FC<NFTCardProps> = ({ nft, selectedNft, setSelectedNft }) =>
         {/* <p>{nft.description}</p> */}
         <p className="nft-collection">{nft.collection.slug}</p>
         {/* <h3 className="nft-title">Details</h3> */}
-
-
 
         <div className="details-container">
           <Row>
