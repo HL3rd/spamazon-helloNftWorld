@@ -345,6 +345,7 @@ a:hover {
   flex-direction: column;
   justify-content: space-between;
   text-align: left;
+  border-radius: 15px;
 }
 
 .product-link {
@@ -361,8 +362,14 @@ a:hover {
 .box-image {
   width: 84%;
   height: 60%;
-  border: 1px solid red;
+  /* border: 1px solid red; */
   align-self: center;
+}
+
+.box-image-link {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .right-side {
@@ -557,14 +564,47 @@ a:hover {
 }
 
 .nft-details {
-  height: 30%;
+  height: 40%;
   padding: 10px;
+  margin: 3%;
+  margin-bottom: 1%;
+  border-radius: 20px;
   background-color: orange;
   overflow: scroll;
 }
 
 .nft-details a {
   color: rgb(19, 168, 138);
+}
+
+.nft-name,
+.nft-collection,
+.nft-title,
+.contract-link,
+.nft-contract,
+.nft-token {
+  margin: 2%;
+  padding: 0;
+  /* background: lime; */
+}
+
+.nft-name {
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
+.contract-link,
+.contract-link:hover,
+.contract-link:focus {
+  border: none;
+  color: #111111;
+  margin: 0;
+}
+
+.nft-contract {
+  text-decoration: none;
+  border: none;
+  color: #111111;
 }
 
 #purchaseOverlay {

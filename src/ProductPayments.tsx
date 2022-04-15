@@ -6,6 +6,7 @@ import './App.css';
 import { ProgressBar } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { formatStripeToUSDString } from './utils/format';
+import Navbar from './components/Navbar';
 
 const ProductPayments: React.FC = () => {
 
@@ -35,75 +36,8 @@ const ProductPayments: React.FC = () => {
 
   return (
     <body>
-      <div className="whole-top">
-        <div className="top">
-          <a href="/">
-            <div>
-              <h1 className="brand">SPAMAZON</h1>
-            </div>
-          </a>
-
-          <div className="user-info">  {/* replace with commented out version below */}
-            <p>Wallet Address: </p> 
-            <p>Wallet Balance: </p>
-            <p></p>
-          </div>
-
-          {/* <div className="user-info">
-            <p>Wallet Address: {walletAddress}</p>
-            <p>Wallet Balance: {userBalance}</p>
-            <p>{errorMessage}</p>
-          </div> */}
-
-
-          <div className="right-side">
-            <a href="/productpayments">
-              <div>
-                <h2 className="productpayments">Account &amp; Payments</h2>
-              </div>
-            </a>
-
-
-            <a href="/checkout">
-              <div>
-                <h2 className="checkout">Checkout</h2>
-              </div>
-            </a>
-          </div>
-        </div>
-
-        <div className="second-top">
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-        </div>
-
-        <div className="fourth-top" id="switching-title">
-          <h2>Account &amp; Payments</h2>
-        </div>
-      </div>
-
-
-
-
-
-
-
-
-
-
-
-
+      <Navbar walletAddress={"a"} userBalance={"a"} errorMessage={"a"} /> 
+      {/* walletAddress={walletAddress} userBalance={userBalance} errorMessage={errorMessage} /> */}
 
       <div className="payments">
         <Row>

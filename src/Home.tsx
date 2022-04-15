@@ -1,86 +1,45 @@
 import React from 'react';
 import './Home.css'
+import Navbar from './components/Navbar';
 
 const Home = () => {
   return (
     <body>
-      <div className="whole-top">
-        <div className="top">
-          <a href="/">
-            <div>
-              <h1 className="brand">SPAMAZON</h1>
-            </div>
-          </a>
-          
-          <div className="right-side">
-            <a href="/productpayments">
-              <div>
-                <h2 className="productpayments">Account &amp; Payments</h2>
-              </div>
-            </a>
-
-
-            <a href="/checkout">
-              <div>
-                <h2 className="checkout">Checkout</h2>
-              </div>
-            </a>
-          </div>
-        </div>
-
-        <div className="second-top">
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-        </div>
-
-        <div className="fourth-top">
-          <h2>Welcome home</h2>
-        </div>
-      </div>
-
+      <Navbar walletAddress={"a"} userBalance={"a"} errorMessage={"a"} /> 
+      {/* walletAddress={walletAddress} userBalance={userBalance} errorMessage={errorMessage} /> */}
+      
 
       <div className="home-content">
         {/* <p><a href="/checkout">Click here to view our product</a></p> */}
         <div className="first-row">
           <div className="home-box">
-            <h4>BOX 1</h4>
+            <h4>Pick Up Where You Left Off: Kitchen Products</h4>
             <div className="box-image">
-              <img/>
+              <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fjuicero.png?alt=media&token=7e38e04d-fa93-4ab8-bb12-f30b10e63616"/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
 
           <div className="home-box">
-            <h4>BOX 2</h4>
+            <h4>Trending Apparel</h4>
             <div className="box-image">
-              <img/>
+              <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fspam_costume.png?alt=media&token=70beb50b-9a28-42f2-bbfa-c7c2ecb1ed9e"/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
 
           <div className="home-box">
-            <h4>BOX 3</h4>
+            <h4>Buy Some Frens</h4>
             <div className="box-image">
-              <img/>
+              <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Frobot.png?alt=media&token=26528dbb-371d-4067-b3cd-5deb9d32cac0"/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
 
           <div className="home-box">
-            <h4>BOX 4</h4>
+            <h4>Buy Again</h4>
             <div className="box-image">
-              <img/>
+              <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fspam_food.png?alt=media&token=27444bb1-f609-4908-a1d7-904051d50a0a"/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
@@ -90,33 +49,33 @@ const Home = () => {
 
         <div className="second-row">
           <div className="home-box">
-            <h4>BOX 5</h4>
+            <h4>At Home Health</h4>
             <div className="box-image">
-              <img/>
+              <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Ftheranos%202.png?alt=media&token=af6300e5-e876-4593-b034-8e871bce504b"/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
 
           <div className="home-box">
-            <h4>BOX 6</h4>
+            <h4>Deal Of The Day</h4>
             <div className="box-image">
-              <img/>
+              <img className="box-image-link" src=""/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
 
           <div className="home-box">
-            <h4>BOX 7</h4>
+            <h4>Inspired By Your Purchases</h4>
             <div className="box-image">
-              <img/>
+              <img className="box-image-link" src=""/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
 
           <div className="home-box">
-            <h4>BOX 8</h4>
+            <h4>Keep Shopping For</h4>
             <div className="box-image">
-              <img/>
+              <img className="box-image-link" src=""/>
             </div>
             <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
           </div>
