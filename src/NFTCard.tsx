@@ -20,8 +20,6 @@ const NFTCard:React.FC<NFTCardProps> = ({ nft, selectedNft, setSelectedNft }) =>
         <p className="nft-collection">{nft.collection.slug}</p>
         {/* <h3 className="nft-title">Details</h3> */}
 
-
-
         <div className="details-container">
           <Row>
             <Col>

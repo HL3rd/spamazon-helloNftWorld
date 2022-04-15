@@ -31,7 +31,7 @@ export class OutstandingNftBalance {
   public sellerAddress: Scalars['String'];
 
   constructor(id:string, data:any) {
-    this.balanceRemaining = (data.amountOwed ? data.amountOwed : 0);
+    this.balanceRemaining = (data.balanceRemaining ? data.balanceRemaining : 0);
     this.balanceStart = (data.balanceStart ? data.balanceStart : 0);
     this.buyerAddress = (data.buyerAddress ? data.buyerAddress : '');
     this.createdAt = (data.createdAt ? data.createdAt : 0);

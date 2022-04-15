@@ -403,12 +403,16 @@ a:hover {
   justify-content: space-evenly;
 }
 
+.balance-img-div {
+  display: flex;
+  justify-content: center;
+}
+
 .balance-img {
-  border: 1px solid green;
-  margin: 0;
   align-self: center;
   width: 30%;
-  height: 10vh;
+  height: 15vh;
+  object-fit: contain;
 }
 
 .balance-info {
@@ -456,12 +460,14 @@ a:hover {
   height: 50vh;
 }
 
+.selected-img-div {
+  display: flex;
+  justify-content: center;
+}
+
 .selected-img {
-  border: 1px solid green;
-  margin: 0;
   align-self: center;
-  width: 30%;
-  height: 24vh;
+  width: 40%;
 }
 
 .selected-info {
