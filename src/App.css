@@ -345,6 +345,7 @@ a:hover {
   flex-direction: column;
   justify-content: space-between;
   text-align: left;
+  border-radius: 15px;
 }
 
 .product-link {
@@ -361,8 +362,14 @@ a:hover {
 .box-image {
   width: 84%;
   height: 60%;
-  border: 1px solid red;
+  /* border: 1px solid red; */
   align-self: center;
+}
+
+.box-image-link {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .right-side {
