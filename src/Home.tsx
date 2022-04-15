@@ -1,54 +1,13 @@
 import React from 'react';
 import './Home.css'
+import Navbar from './components/Navbar';
 
 const Home = () => {
   return (
     <body>
-      <div className="whole-top">
-        <div className="top">
-          <a href="/">
-            <div>
-              <h1 className="brand">SPAMAZON</h1>
-            </div>
-          </a>
-          
-          <div className="right-side">
-            <a href="/productpayments">
-              <div>
-                <h2 className="productpayments">Account &amp; Payments</h2>
-              </div>
-            </a>
-
-
-            <a href="/checkout">
-              <div>
-                <h2 className="checkout">Checkout</h2>
-              </div>
-            </a>
-          </div>
-        </div>
-
-        <div className="second-top">
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-          <h3>Spam</h3>
-        </div>
-
-        <div className="fourth-top">
-          <h2>Welcome home</h2>
-        </div>
-      </div>
-
+      <Navbar walletAddress={"a"} userBalance={"a"} errorMessage={"a"} /> 
+      {/* walletAddress={walletAddress} userBalance={userBalance} errorMessage={errorMessage} /> */}
+      
 
       <div className="home-content">
         {/* <p><a href="/checkout">Click here to view our product</a></p> */}
