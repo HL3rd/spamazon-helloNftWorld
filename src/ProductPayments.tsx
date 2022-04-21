@@ -61,19 +61,35 @@ const ProductPayments: React.FC = () => {
       })
   }
 
-  // Gets percentage % of remaining balance paid off
-
+  /**
+   * 
+   * @returns 
+   * 
+   * Gets percentage % of remaining balance paid off
+   */
   const getOutstandingBalanacePaidPercent = () => {
     if (!currentOustandingBalance) return;
     return (((currentOustandingBalance.balanceStart - currentOustandingBalance.balanceRemaining) / currentOustandingBalance.balanceStart) * 100);
   }
 
+  /**
+   * 
+   * @returns 
+   * 
+   * Live state change register as user enters payment amount
+   */
   const enteringPaymentAmount = (e:any) => {
 
     let intendedAmount = e.target.value;
+    
+    if (intendedAmount < 0) {
+      setErrorMessage('Please enter a value greater than zero.');
+      return;
+    }
+
     setErrorMessage('');
 
-    if (intendedAmount > currentOustandingBalance!.balanceRemaining) {
+    if (intendedAmount >= currentOustandingBalance!.balanceRemaining) {
       // Activate Pay in full state
       setIsPayingFull(true);
       setPaymentAmount(currentOustandingBalance!.balanceRemaining);
@@ -86,24 +102,41 @@ const ProductPayments: React.FC = () => {
 
   }
 
-  // Pay this outstanding object
+  /**
+   * 
+   * @param event 
+   * @returns 
+   * 
+   * Pay this outstanding object
+   */
   const payOutstandingBalance = async (event:any) => {
 
     event.preventDefault();
-
-    console.log(`PAYING THIS MUCH:::::: ${Number(paymentAmount)}`);
 
     if (!currentOustandingBalance) {
       setErrorMessage(`Please select and outstanding balance item first.`);
       return;
     }
 
-    // const exactAmount = await getExactPaymentleft("0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6", currentOustandingBalance!.nftContractAddress, currentOustandingBalance!.nftTokenId);
-    // const repayResp = await repayStore(currentOustandingBalance!.id, currentOustandingBalance!.nftContractAddress, currentOustandingBalance!.nftTokenId, paymentAmount);
+    console.log(`PAYING THIS MUCH:::::: ${Number(paymentAmount)}`);
 
-    // if (!repayResp.success) {
-    //   setErrorMessage(repayResp.status);
-    // }
+    var actualPayment = paymentAmount;
+
+    const nftContractAddr = currentOustandingBalance!.nftContractAddress;
+    const nftTokenId = currentOustandingBalance!.nftTokenId;
+
+    if (isPayingFull) {
+      actualPayment = Number(await getExactPaymentleft("0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6", nftContractAddr, nftTokenId));
+    }
+
+    // Amount in ETH is returned, might be a chance that we need Wei
+    const balanceDocId = currentOustandingBalance!.id;
+
+    const repayResp = await repayStore(balanceDocId, nftContractAddr, nftTokenId, paymentAmount, isPayingFull);
+
+    if (!repayResp.success) {
+      setErrorMessage(repayResp.status);
+    }
 
   }
 
@@ -187,7 +220,6 @@ const ProductPayments: React.FC = () => {
                     <p className="selected-amount-input">Amount to Pay:</p>
                     <input
                       type="number"
-                      min="0"
                       onChange={(event) => enteringPaymentAmount(event)}
                       value={paymentAmount}
                     />

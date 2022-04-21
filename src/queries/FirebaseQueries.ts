@@ -70,7 +70,7 @@ export const queryOutstandingNftBalances = async (walletAddress:string) => {
                       .orderBy('balanceRemaining')
                       .orderBy('createdAt', 'desc')
                       .get();
-                      
+
   const outstandingPaymentsArray = querySnapshot.docs.map((doc) => new OutstandingNftBalance(doc.id, doc.data()))
 
   return outstandingPaymentsArray;
@@ -91,12 +91,13 @@ export const queryOutstandingNftBalances = async (walletAddress:string) => {
 // METAMASK:
     // 0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6
 
-export const makePaymentOnOutstandingBalance = async (docId: string, amount:number) => {
+export const makePaymentOnOutstandingBalance = async (docId: string, amount:number, isPayingFull:boolean) => {
 
   const docRef = (await db.collection('outstandingNftBalance').doc(docId).get()).ref
 
-  docRef.update({balanceRemaining: FieldValue.increment(-amount)})
-    .then(() => {
+  var query = (isPayingFull) ?  docRef.update({balanceRemaining: 0}) : docRef.update({balanceRemaining: FieldValue.increment(-amount)})
+  
+  query.then(() => {
       console.log(`Succesfully made payment in Firestore of ${amount} ETH`);
     })
     .catch((err) => {

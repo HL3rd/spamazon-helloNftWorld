@@ -26,8 +26,8 @@ async function main() {
   const testSellerAddr = "0x6E9190A074371C3A1b96120D2b1A3834D9d51F64";
   const testNftContractAddr = "0x08207fe7f1f7c9f1c39e4720b9f7bfe2afd01907"; // NFT contract address
   const testTokenId = 11;  // NFT token id
-  const testItemValueETH = 1;
-  const testPayCount = 3;
+  const testItemValueETH = 0.033037864696728925;
+  const testPayCount = 1;
   const testPaymentValueWei = ethers.utils.parseEther(`${testItemValueETH / testPayCount}`);
   console.log( `payment value in wei = ${testPaymentValueWei}`);
   
