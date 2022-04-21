@@ -26,6 +26,7 @@ export class OutstandingNftBalance {
   public createdAt: Scalars['Int'];
   public id: Scalars['String'];
   public nftContractAddress: Scalars['String'];
+  public nftImageUrl: Scalars['String'];
   public nftTokenId: Scalars['Int'];
   public product: Product;
   public sellerAddress: Scalars['String'];
@@ -37,6 +38,7 @@ export class OutstandingNftBalance {
     this.createdAt = (data.createdAt ? data.createdAt : 0);
     this.id = id;
     this.nftContractAddress = (data.nftContractAddress ? data.nftContractAddress : '');
+    this.nftImageUrl = (data.nftImageUrl ? data.nftImageUrl : '');
     this.nftTokenId = (data.nftTokenId ? data.nftTokenId : '');
     this.product = (data.product ? data.product : testProduct);
     this.sellerAddress = (data.sellerAddress ? data.sellerAddress : '');

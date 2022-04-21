@@ -99,7 +99,7 @@ const Checkout:React.FC = () => {
 
   return (
     <div>
-      <Navbar walletAddress={walletAddress} userBalance={userBalance} errorMessage={errorMessage} />
+      <Navbar walletAddress={walletAddress} userBalance={userBalance} title={"Checkout"} errorMessage={errorMessage} />
       <div className="sell-content">
         <div className="sell-cols">
 

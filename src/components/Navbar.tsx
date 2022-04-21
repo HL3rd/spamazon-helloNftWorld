@@ -3,10 +3,11 @@ import React from 'react';
 interface NavbarProps {
   walletAddress: string|null,
   userBalance: string|null,
+  title: string,
   errorMessage: any
 }
 
-const Navbar:React.FC<NavbarProps> = ({ walletAddress, userBalance, errorMessage }) => {
+const Navbar:React.FC<NavbarProps> = ({ walletAddress, userBalance, title, errorMessage }) => {
  return (
   <div className="whole-top">
     <div className="top">
@@ -54,7 +55,7 @@ const Navbar:React.FC<NavbarProps> = ({ walletAddress, userBalance, errorMessage
     </div>
 
     <div className="fourth-top" id="switching-title">
-      <h2>Account &amp; Payments</h2>
+      <h2>{title}</h2>
     </div>
   </div>
   )

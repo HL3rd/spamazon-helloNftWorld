@@ -70,6 +70,11 @@ const ProductPayments: React.FC = () => {
     setCurrentOutstandingBalance(oustandingNftBalance);
   }
 
+  const getOutstandingBalanacePaidPercent = () => {
+    if (!currentOustandingBalance) return;
+    return (((currentOustandingBalance.balanceStart - currentOustandingBalance.balanceRemaining) / currentOustandingBalance.balanceStart) * 100);
+  }
+
   // Pay this outstanding object
   const triggeredPaymentToOutstandingBalance = async (event:any) => {
 
@@ -85,30 +90,24 @@ const ProductPayments: React.FC = () => {
   }
 
   useEffect(() => {
-    console.log(`NOW IN THE PAYMENTS PAGE!`);
     connectWalletAndQueryBalances();
   }, [])
 
   return (
-    <body>
-      <Navbar walletAddress={"a"} userBalance={"a"} errorMessage={"a"} /> 
-      {/* walletAddress={walletAddress} userBalance={userBalance} errorMessage={errorMessage} /> */}
-
+    <div>
+      <Navbar walletAddress={"a"} userBalance={"a"} title={"Account & Payments"} errorMessage={"a"} />
       <div className="payments">
         <Row>
-          {/* fills about 25% on large screens and 100% on small */}
-          <Col xs={12} md={3} className="left-col">
+          <Col xs={12} md={3} className="pay-left-col">
             <Row>
               <h1>Outstanding Balances</h1>
               { oustandingBalancesArr.length > 0 &&
-              <div className="nft-content">
+              <div className="outstanding-items">
                 { oustandingBalancesArr.map((balanceObj:OutstandingNftBalance, index:any) => {
                   return (
-                    <a onClick={() => { console.log(JSON.stringify(balanceObj)); selectedOutstandingBalance(balanceObj)}} key={index}>
+                    <a onClick={() => { selectedOutstandingBalance(balanceObj)}} key={index} className="balance-box-link">
                       <div className="balance-box">
-                        <div className="balance-img-div">
-                          <img className="balance-img" src={balanceObj.product.productImageUrls[0]} />
-                        </div>
+                        <img className="balance-img" src={balanceObj.product.productImageUrls[0]} />
                         <div className="balance-info">
                           <p className="balance-title">{balanceObj.product.name}</p>
                           <p className="balance-amount">Remaining Balance: {balanceObj.balanceRemaining} </p>
@@ -121,51 +120,45 @@ const ProductPayments: React.FC = () => {
               }
             </Row>
           </Col>
-          <Col xs={12} md={6} className="right-col">
+
+          <Col xs={12} md={6} className="pay-right-col">
             { oustandingBalancesArr.length <= 0 &&
-                <h3 className="selected-title">Looks like you have no oustanding balances!</h3>
+              <h3 className="h3-subtitle">Looks like you have no oustanding balances!</h3>
+            }
+            { oustandingBalancesArr.length > 0 && !currentOustandingBalance &&
+              <h3 className="h3-subtitle">Select an outstanding balance to begin paying it off!</h3>
             }
             { currentOustandingBalance &&
-            <div className="selected-box">
-              <div className="selected-img-div">
-                <img className="selected-img" alt={currentOustandingBalance.id} src={currentOustandingBalance.product.productImageUrls[0]} />
-              </div>
-
-              <div className="right-side-col">
-
-                <div className="selected-info">
+              <div className="selected-box">
+                <div className="selected-img-div">
+                  <img className="selected-img" alt={currentOustandingBalance.id} src={currentOustandingBalance.product.productImageUrls[0]} />
+                </div>
+                <div className="selected-info-div">
                   <h3 className="selected-title">{currentOustandingBalance.product.name}</h3>
-                  <p className="selected-amount">Remaining Balance: {currentOustandingBalance.balanceRemaining} ETH</p>
-
+                  <p className="selected-subtitle">Remaining Balance: {currentOustandingBalance.balanceRemaining} WETH</p>
                   <div className="progressBar">
                     <ProgressBar
-                      now={((currentOustandingBalance.balanceStart - currentOustandingBalance.balanceRemaining)  / currentOustandingBalance.balanceStart) * 100}
-                      label={`${((currentOustandingBalance.balanceStart -currentOustandingBalance.balanceRemaining) / currentOustandingBalance.balanceStart) * 100}% already paid`}
+                      now={ getOutstandingBalanacePaidPercent() }
+                      label={`${ getOutstandingBalanacePaidPercent() }% already paid`}
                     />
                   </div>
-
                   <form className="form-input" onSubmit={(e:any) => triggeredPaymentToOutstandingBalance(e)}>
                     <p className="selected-amount-input">Amount to Pay:</p>
                     <input
                       type="text"
                       placeholder="e.g. 0.5"
-                      // maxLength="18"
-                      // onChange={(event) => setPayment(event.target.value)}
+                      onChange={(event) => setPaymentAmount(Number(event.target.value))}
                     />
                     <button className="pay-btn">Pay</button>
                   </form>
-                  
                 </div>
-                
               </div>
-            </div>
             }
           </Col>
+
         </Row>
       </div>
-
-      
-    </body>
+    </div>
   );
 };
 

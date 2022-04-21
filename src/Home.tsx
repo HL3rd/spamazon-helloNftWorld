@@ -16,8 +16,8 @@ const Home = () => {
 
 
   return (
-    <body>
-      <Navbar walletAddress={"a"} userBalance={"a"} errorMessage={"a"} /> 
+    <div>
+      <Navbar walletAddress={"a"} userBalance={"a"} title={"Shopping"} errorMessage={"a"} /> 
       {/* walletAddress={walletAddress} userBalance={userBalance} errorMessage={errorMessage} /> */}
       
 
@@ -94,7 +94,7 @@ const Home = () => {
         </div>
 
       </div>
-    </body>
+    </div>
     
   );
 }

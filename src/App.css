@@ -37,6 +37,10 @@ h3 {
   padding-top: 0.4em;
 }
 
+.h3-subtitle {
+  font-size: 2em;
+}
+
 h4 {
   text-align: left;
   margin: 1em;
@@ -49,7 +53,6 @@ p {
 }
 
 button {
-  margin: 0.6em 0.75em;
   padding: 10px 25px;
   border-radius: 10px;
   font-weight: bold;
@@ -169,7 +172,6 @@ a:hover {
 }
 
 .whole-top {
-  /* border: 1px solid orange; */
   height: 20vh;
 }
 
@@ -249,6 +251,7 @@ a:hover {
 }
 
 .buy-btn {
+  margin: 0.6em 0.75em;
   color: #111111;
   background: #ff9900;
   border-radius: 30px;
@@ -263,6 +266,7 @@ a:hover {
 }
 
 .sell-btn {
+  margin: 0.6em 0.75em;
   color: #111111;
   background: #fee33c;
   border-radius: 30px;
@@ -313,7 +317,7 @@ a:hover {
   border-radius: 20px;
   width: 25em;
   height: 70vh;
-  padding: 10px 10px 10px 10px;
+  padding: 10px 10px 20px 10px;
   margin: 10px 3.5em 10px 10px;
 }
 
@@ -382,30 +386,42 @@ a:hover {
   align-content: center;
   color: #000000;
   background: rgb(231, 231, 231);
-  margin: 0;
+  margin: 1em 0 0 0;
   height: 80vh;
 }
 
-.left-col {
-  margin: 0.5rem;
-  margin-left: 10%;
-  margin-top: 1.3%;
-  /* border: 1px solid blue; */
+.pay-left-col {
+  margin: 0.5rem auto;
+  background-color: pink;
+}
+
+.pay-right-col {
+  margin: 0.5rem auto;
+  padding: 7vh 0;
+  background-color: lime;
+  /* border: 1px solid red; */
+}
+
+.outstanding-items {
+  overflow: scroll;
+  width: 100%;
+  height: 50vh;
+  padding: 10px;
+}
+
+.balance-box-link:hover {
+  border: 0px !important;
 }
 
 .balance-box {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 5px;
   border: 1px solid #cccccc;
   border-left: 5px solid #ff9900;
   border-radius: 5px;
   background: #ffffff;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-}
-
-.balance-img-div {
-  display: flex;
-  justify-content: center;
+  color: #111111;
 }
 
 .balance-img {
@@ -413,21 +429,18 @@ a:hover {
   width: 30%;
   height: 15vh;
   object-fit: contain;
+  background-color: cyan;
 }
 
 .balance-info {
-  /* border: 1px solid purple; */
   width: 60%;
-  height: 10vh;
-  margin-top: 2vh;
-  margin-bottom: 2vh;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
+  background-color: purple;
 }
 
 .balance-title {
-  /* border: 1px solid red; */
   font-weight: bold;
   text-align: left;
   font-size: 1.1em;
@@ -436,28 +449,20 @@ a:hover {
 }
 
 .balance-amount {
-  /* border: 1px solid green; */
   text-align: left;
   font-size: 0.9em;
   margin: 0;
   padding: 0;
 }
 
-.right-col {
-  margin: 0.5rem;
-  margin-right: 10%;
-  padding: 7vh 0;
-  /* border: 1px solid red; */
-}
-
 .selected-box {
-  border: 1px solid #cccccc;
-  border-radius: 5px;
-  background: #ffffff;
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  padding: 1.5em;
   height: 50vh;
+  background: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
 }
 
 .selected-img-div {
@@ -470,19 +475,14 @@ a:hover {
   width: 40%;
 }
 
-.selected-info {
-  /* border: 1px solid purple; */
-  width: 30vw;
-  height: 13vh;
-  margin-top: 3vh;
-  margin-bottom: 2vh;
+.selected-info-div {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  align-self: center;
+  background-color: yellow;
 }
 
 .selected-title {
-  /* border: 1px solid red; */
   font-weight: bold;
   text-align: left;
   font-size: 1.5em;
@@ -491,44 +491,28 @@ a:hover {
   padding: 0;
 }
 
-.selected-amount {
-  /* border: 1px solid green; */
+.selected-subtitle {
   text-align: left;
-  font-size: 1.3em;
   margin: 0;
   margin-bottom: 2vh;
   padding: 0;
-}
-
-.right-side-col {
-  display: flex;
-  flex-direction: column;
-  align-self: center;
-}
-
-.left-btn {
-  text-align: center;
 }
 
 .form-input {
-  /* border: 1px solid red; */
   display: flex;
   flex-direction: row;
   justify-content: left;
+  background-color: orange;
+  height: 3em;
 }
 
 .selected-amount-input {
-  /* border: 1px solid green; */
   text-align: left;
-  font-size: 1.3em;
-  margin: 0;
-  margin-bottom: 2vh;
-  padding: 0;
-  padding-right: 2vh;
+  margin: 0 0 2vh 0;
+  padding: 0 2vh 0 0;
 }
 
 .progressBar {
-  /* border: 1px solid red; */
   margin: 0;
   margin-left: 0;
   margin-bottom: 2vh;
@@ -536,15 +520,12 @@ a:hover {
 }
 
 .pay-btn {
-  color: #111111;
-  background: #ff9900;
-  border-radius: 30px;
+  padding: 10px 50px;
+  border-radius: 10em;
   border: 1px solid #ff9900;
   box-shadow: 1px 0px 5px #b8b8b8;
-  margin-top: 10%;
-  justify-self: center;
-  padding-right: 5vw;
-  padding-left: 5vw;
+  background: #ff9900;
+  color: #111111;
 }
 
 .pay-btn:hover,
@@ -675,6 +656,7 @@ a:hover {
 }
 
 .market-btn {
+  margin: 0.6em 0.75em;
   color: #111111;
   background: #fee33c;
   border-radius: 30px;
@@ -705,6 +687,7 @@ a:hover {
 }
 
 .cancel-btn {
+  margin: 0.6em 0.75em;
   color: #111111;
   background: #bdbdbd;
   border-radius: 30px;
@@ -735,6 +718,7 @@ a:hover {
 }
 
 .confirm-btn {
+  margin: 0.6em 0.75em;
   color: #111111;
   background: #fee33c;
   border-radius: 30px;
