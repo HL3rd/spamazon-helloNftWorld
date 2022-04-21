@@ -78,10 +78,10 @@ const Checkout:React.FC = () => {
   }
 
   // Check if user changes their connected account
-  (window as any).ethereum.on('accountChanged', accountChangedHandler);
+  if (window !== undefined) { (window as any).ethereum.on('accountChanged', accountChangedHandler) };
 
   // If user changes testnets or test to devnet, reload site
-  (window as any).ethereum.on('chainChanged', chainChangedHandler);
+  if (window !== undefined) { (window as any).ethereum.on('chainChanged', chainChangedHandler) };
 
   // NFTs will not show until ETH price is set
   const callEthPriceCheck = async () => {
@@ -98,7 +98,7 @@ const Checkout:React.FC = () => {
   }, []);
 
   return (
-    <body>
+    <div>
       <Navbar walletAddress={walletAddress} userBalance={userBalance} errorMessage={errorMessage} />
       <div className="sell-content">
         <div className="sell-cols">
@@ -145,14 +145,8 @@ const Checkout:React.FC = () => {
             setSelectedNft={setSelectedNft}
           />
         </div>}
-      </div>
-
-      {/* <div>
-        <h2>Ayo? Tryna Mint?</h2>
-        <h3><a href="/minter">Minter</a></h3>
-      </div> */}
-            
-    </body>
+      </div>          
+    </div>
   );
 }
 

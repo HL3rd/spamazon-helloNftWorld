@@ -1,8 +1,8 @@
 import { Product } from '../constants/class-objects';
 import { ethers } from 'ethers';
 import { db, FieldValue } from '../utils/firebase';
-import { getCurrentTimestamp } from '../utils/format';
 import { openSeaCollectionFloorPrice } from '../queries/NftData';
+import { setOutstandingBalanceDoc, makePaymentOnOutstandingBalance } from '../queries/FirebaseQueries';
 
 const BARTER_CONTRACT_ADDRESS = "0xc24afecb277Dd2f5b50b5B51f1fC9d5b8234101A";
 const barterContractInfo = require('../artifacts/Barter.json');
@@ -185,55 +185,12 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
 /**
  * 
  * @param nft 
- * @param product 
- * @param ethPrice 
- * @param signer 
- * 
- * Function writes the transaction above to a Firestore document for tracking
- * 
- */
-export const setOutstandingBalanceDoc = async (nft:any, product:Product, ethPrice:any, signer:ethers.providers.JsonRpcSigner) => {
-
-  const walletAddress = await signer.getAddress();
-  const currTimestamp = getCurrentTimestamp();
-
-  const productPriceEth = (product.price / 100) / ethPrice;
-
-  const newOutstandingDocRef = db.collection("outstandingNftBalance").doc();
-
-  const nftBalanceData = {
-    balanceRemaining: productPriceEth,
-    balanceStart: productPriceEth,
-    buyerAddress: walletAddress,
-    createdAt: currTimestamp,
-    id: newOutstandingDocRef.id,
-    nftContractAddress: nft.asset_contract.address,
-    nftTokenId: nft.token_id,
-    product: {
-      description: product.description,
-      id: product.id,
-      isListed: product.isListed,
-      name: product.name,
-      price: product.price,
-      productImageUrls: product.productImageUrls,
-      quantity: product.quantity,
-    },
-    sellerAddress: STORE_WALLET_ADDRESS,
-  }
-  newOutstandingDocRef.set(nftBalanceData, { merge: true })
-    .then(() => { })
-    .catch((err:Error) => { })
-};
-
-/**
- * 
- * @param nft 
  * @returns 
  * 
  * Function allows user to repay in WETH to receive NFT again
  * 
  */
- export const repayStore = async (nftContractAddress:string, nftTokenId:any, paymentInETH:any) => {
+ export const repayStore = async (docId:string, nftContractAddress:string, nftTokenId:any, paymentInETH:any) => {
 
   const buyerAddr = window.ethereum.selectedAddress;
 
@@ -263,7 +220,7 @@ export const setOutstandingBalanceDoc = async (nft:any, product:Product, ethPric
     // Barter contract instance
     const barterContract = new ethers.Contract(BARTER_CONTRACT_ADDRESS, barterContractInfo.abi, signer);
     
-    // TODO: ADD FIRESTORE FUNCTION TO RECORD THIS PAYMENT AND UPDATE THE BALANCE OF A PRODUCT
+    makePaymentOnOutstandingBalance(docId, paymentInETH);
 
     // WETH addr now approved, trigger the WETH transfer
     const transferTx = await barterContract.repay(

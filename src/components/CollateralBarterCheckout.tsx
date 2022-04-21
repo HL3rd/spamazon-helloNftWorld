@@ -70,7 +70,9 @@ const CollateralBarterCheckout:React.FC<CollateralBarterCheckoutProps> = ({ sele
               <div className="first-step">
                 <h3 className="floor-price">Confirm Purchase</h3>
                 <p className="confirm-exchange">Click 'Confirm Exchange' in order to post your NFT as collateral to pay for {product.name} later.</p>
-                <p className="confirm-exchange-extra">This means you will have to pay {(product.price / 100) / ethPrice} WETH within 30 days to get your NFT back.</p>
+                <p className="confirm-exchange-extra">This means you will have to pay</p>
+                <p><strong>{(product.price / 100) / ethPrice} WETH</strong><br />(${product.price / 100} USD)</p>
+                <p>within 30 days to get your NFT back.</p>
                 <button className="market-btn" onClick={() => executeCollateralizedPurchase(selectedNft, product, ethPrice)}>Confirm Exchange</button>
                 <button className="cancel-btn" onClick={() => setSelectedNft(null)}>Cancel</button>
                 { exchangeStatus !== null && !exchangeStatus && <p>Oops! Something went wrong</p>}
