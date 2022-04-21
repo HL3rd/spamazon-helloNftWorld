@@ -104,9 +104,9 @@ const Checkout:React.FC = () => {
         <div className="sell-cols">
 
           <div className="far-left-col">
-            <img onClick={() => imageClick(testProduct.productImageUrls[0])} className="highlight-img" alt="product-img" width="100px" height="100px" src={testProduct.productImageUrls[0]} />
-            <img onClick={() => imageClick(testProduct.productImageUrls[1])} className="highlight-img" alt="product-img" width="100px" height="100px" src={testProduct.productImageUrls[1]} />
-            <img onClick={() => imageClick(testProduct.productImageUrls[2])} className="highlight-img" alt="product-img" width="100px" height="100px" src={testProduct.productImageUrls[2]} />
+            { testProduct.productImageUrls.map((url:string, index:any) => {
+              return <img key={index} onClick={() => imageClick(url)} className="highlight-img" alt="preview-img" width="100px" height="100px" src={url} />
+            })}
           </div>
 
           <div className="center-left-col">

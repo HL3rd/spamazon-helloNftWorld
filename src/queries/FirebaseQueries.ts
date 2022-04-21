@@ -25,13 +25,15 @@ const STORE_WALLET_ADDRESS = "0x2929C3c9805dD1A16546251b9b0B65583FD302c8"
 
   const buyerAddr = `${buyerAddress}`.toLowerCase();
 
+  const nftContractAddr = (nft.asset_contract.address).toLowerCase()
+
   const nftBalanceData = {
     balanceRemaining: productPriceEth,
     balanceStart: productPriceEth,
     buyerAddress: buyerAddr,
     createdAt: currTimestamp,
     id: newOutstandingDocRef.id,
-    nftContractAddress: nft.asset_contract.address,
+    nftContractAddress: nftContractAddr,
     nftImageUrl: nft.image_url,
     nftTokenId: nft.token_id,
     product: {
@@ -68,8 +70,7 @@ export const queryOutstandingNftBalances = async (walletAddress:string) => {
                       .orderBy('balanceRemaining')
                       .orderBy('createdAt', 'desc')
                       .get();
-  console.log(`GOT: ${querySnapshot.docs.length} DOCS: ${JSON.stringify(querySnapshot.docs)}`);
-
+                      
   const outstandingPaymentsArray = querySnapshot.docs.map((doc) => new OutstandingNftBalance(doc.id, doc.data()))
 
   return outstandingPaymentsArray;

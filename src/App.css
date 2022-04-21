@@ -125,7 +125,6 @@ a:hover {
 .top {
   display: flex;
   flex-direction: row;
-  /* border: 2px solid lime; */
   justify-content: space-between;
   background: #111111;
 }
@@ -166,7 +165,7 @@ a:hover {
   align-content: center;
   color: #000000;
   background: #ffffff;
-  margin: 0;
+  margin: 1em 0 0 0;
   padding: 0;
   position: relative;
 }
@@ -195,7 +194,6 @@ a:hover {
 
 .far-left-col {
   width: 10%;
-  /* border:1px solid lime; */
   justify-content: space-around;
   padding: 1.2em;
   padding-left: 0;
@@ -204,20 +202,23 @@ a:hover {
 .center-left-col {
   width: 25%;
   max-height: fit-content;
-  /* border:1px solid red; */
   margin-top: auto;
   margin-bottom: auto;
 }
 
 .center-right-col {
   width: 30%;
-  /* border:1px solid blue; */
   text-align: left;
 }
 
 .far-right-col {
   width: 20%;
   border:1px solid lightgray;
+}
+
+.product-img {
+  max-height: 50px;
+  max-width: 100%;
 }
 
 .product-name {
@@ -392,14 +393,11 @@ a:hover {
 
 .pay-left-col {
   margin: 0.5rem auto;
-  background-color: pink;
 }
 
 .pay-right-col {
   margin: 0.5rem auto;
   padding: 7vh 0;
-  background-color: lime;
-  /* border: 1px solid red; */
 }
 
 .outstanding-items {
@@ -429,7 +427,6 @@ a:hover {
   width: 30%;
   height: 15vh;
   object-fit: contain;
-  background-color: cyan;
 }
 
 .balance-info {
@@ -437,7 +434,6 @@ a:hover {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  background-color: purple;
 }
 
 .balance-title {
@@ -479,7 +475,6 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-self: center;
-  background-color: yellow;
 }
 
 .selected-title {
@@ -502,7 +497,6 @@ a:hover {
   display: flex;
   flex-direction: row;
   justify-content: left;
-  background-color: orange;
   height: 3em;
 }
 
@@ -519,6 +513,10 @@ a:hover {
   text-align: left;
 }
 
+.pay-btns-div {
+  display: block;
+}
+
 .pay-btn {
   padding: 10px 50px;
   border-radius: 10em;
@@ -526,12 +524,23 @@ a:hover {
   box-shadow: 1px 0px 5px #b8b8b8;
   background: #ff9900;
   color: #111111;
+  margin-left: 10px;
 }
 
 .pay-btn:hover,
 .pay-btn:focus {
   background: #ec7301;
   border: 1px solid #ec7301;
+}
+
+.pay-full-btn {
+  color: #111111;
+}
+
+.pay-full-btn:hover {
+  text-decoration: underline;
+  cursor: pointer;
+  color: #111111;
 }
 
 .balance-box-unselected {
@@ -572,7 +581,6 @@ a:hover {
 .nft-token {
   margin: 2%;
   padding: 0;
-  /* background: lime; */
 }
 
 .nft-name {

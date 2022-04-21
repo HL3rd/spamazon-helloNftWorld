@@ -26,6 +26,7 @@ const ProductPayments: React.FC = () => {
 
   // payment
   const [paymentAmount, setPaymentAmount] = useState(0);
+  const [isPayingFull, setIsPayingFull] = useState(false);
 
   // First function called in useEffect
   const connectWalletAndQueryBalances = async () => {
@@ -33,7 +34,6 @@ const ProductPayments: React.FC = () => {
     // Connect Wallet if needed
     const resp:any = await connectWallet();
     const addr = resp.address;
-    console.log(`ADDRESSS ${addr}`);
 
     if (addr !== "") {
       accountChangedHandler(addr);
@@ -47,10 +47,7 @@ const ProductPayments: React.FC = () => {
     setWalletAddress(newAccount);
     getUserBalance(newAccount);
 
-    console.log(`GONNA TEST CASES: ${newAccount} /// VS /// ${newAccount.toString()}`);
-
     if (!callingBalances) {
-      console.log(`SHOULD CALLLL`)
       const balancesArray = await queryOutstandingNftBalances(newAccount);
       setCallingBalances(false);
       setOutstandingBalancesArr(balancesArray);
@@ -64,28 +61,72 @@ const ProductPayments: React.FC = () => {
       })
   }
 
-  // Selected an outstanding balance to pay
-  const selectedOutstandingBalance = async (oustandingNftBalance:OutstandingNftBalance) => {
-    console.log('BAAAAAAAAAAMMMMMMMMM', (oustandingNftBalance.balanceStart -oustandingNftBalance.balanceRemaining) / oustandingNftBalance.balanceStart);
-    setCurrentOutstandingBalance(oustandingNftBalance);
-  }
+  // Gets percentage % of remaining balance paid off
 
   const getOutstandingBalanacePaidPercent = () => {
     if (!currentOustandingBalance) return;
     return (((currentOustandingBalance.balanceStart - currentOustandingBalance.balanceRemaining) / currentOustandingBalance.balanceStart) * 100);
   }
 
+  const enteringPaymentAmount = (e:any) => {
+
+    let intendedAmount = e.target.value;
+    setErrorMessage('');
+
+    if (intendedAmount > currentOustandingBalance!.balanceRemaining) {
+      // Activate Pay in full state
+      setIsPayingFull(true);
+      setPaymentAmount(currentOustandingBalance!.balanceRemaining);
+      setErrorMessage(`You cannot pay more than what you owe.`);
+    } else {
+      // Else, continue
+      setIsPayingFull(false);
+      setPaymentAmount(intendedAmount);
+    }
+
+  }
+
   // Pay this outstanding object
-  const triggeredPaymentToOutstandingBalance = async (event:any) => {
+  const payOutstandingBalance = async (event:any) => {
 
     event.preventDefault();
 
-    const amountPaid = event.target[0].value;
-    console.log(`PAYINH:::::: ${amountPaid}`);
+    console.log(`PAYING THIS MUCH:::::: ${Number(paymentAmount)}`);
 
-    const exactAmount = await getExactPaymentleft("0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6", currentOustandingBalance!.nftContractAddress, currentOustandingBalance!.nftTokenId);
+    if (!currentOustandingBalance) {
+      setErrorMessage(`Please select and outstanding balance item first.`);
+      return;
+    }
 
-    await repayStore(currentOustandingBalance!.id, currentOustandingBalance!.nftContractAddress, currentOustandingBalance!.nftTokenId, exactAmount);
+    // const exactAmount = await getExactPaymentleft("0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6", currentOustandingBalance!.nftContractAddress, currentOustandingBalance!.nftTokenId);
+    // const repayResp = await repayStore(currentOustandingBalance!.id, currentOustandingBalance!.nftContractAddress, currentOustandingBalance!.nftTokenId, paymentAmount);
+
+    // if (!repayResp.success) {
+    //   setErrorMessage(repayResp.status);
+    // }
+
+  }
+
+  const enterRemainginBalance = async () => {
+
+    if (!currentOustandingBalance) {
+      setErrorMessage(`Please select an outstanding balance before proceeding`);
+      return;
+    }
+
+    if (!walletAddress) {
+      setErrorMessage(`Please select a valid ETH wallet on Rinkeby before proceeding`);
+      return;
+    }
+
+    setIsPayingFull(true);
+
+    const nftContractAddr = currentOustandingBalance.nftContractAddress;
+    const nftTokenId = currentOustandingBalance.nftTokenId;
+    
+    const amountResp = await getExactPaymentleft(walletAddress, nftContractAddr, nftTokenId);
+
+    setPaymentAmount(Number(amountResp));
 
   }
 
@@ -95,7 +136,7 @@ const ProductPayments: React.FC = () => {
 
   return (
     <div>
-      <Navbar walletAddress={"a"} userBalance={"a"} title={"Account & Payments"} errorMessage={"a"} />
+      <Navbar walletAddress={walletAddress} userBalance={userBalance} title={"Account & Payments"} errorMessage={""} />
       <div className="payments">
         <Row>
           <Col xs={12} md={3} className="pay-left-col">
@@ -105,7 +146,7 @@ const ProductPayments: React.FC = () => {
               <div className="outstanding-items">
                 { oustandingBalancesArr.map((balanceObj:OutstandingNftBalance, index:any) => {
                   return (
-                    <a onClick={() => { selectedOutstandingBalance(balanceObj)}} key={index} className="balance-box-link">
+                    <a key={index} onClick={() => { setCurrentOutstandingBalance(balanceObj) }} className="balance-box-link">
                       <div className="balance-box">
                         <img className="balance-img" src={balanceObj.product.productImageUrls[0]} />
                         <div className="balance-info">
@@ -142,15 +183,20 @@ const ProductPayments: React.FC = () => {
                       label={`${ getOutstandingBalanacePaidPercent() }% already paid`}
                     />
                   </div>
-                  <form className="form-input" onSubmit={(e:any) => triggeredPaymentToOutstandingBalance(e)}>
+                  <form className="form-input" onSubmit={(e:any) => payOutstandingBalance(e)}>
                     <p className="selected-amount-input">Amount to Pay:</p>
                     <input
-                      type="text"
-                      placeholder="e.g. 0.5"
-                      onChange={(event) => setPaymentAmount(Number(event.target.value))}
+                      type="number"
+                      min="0"
+                      onChange={(event) => enteringPaymentAmount(event)}
+                      value={paymentAmount}
                     />
-                    <button className="pay-btn">Pay</button>
+                    <div className="pay-btns-div">
+                      <button className="pay-btn">Pay</button>
+                      <a className="pay-full-btn" onClick={() => enterRemainginBalance()}>Pay full balance</a>
+                    </div>
                   </form>
+                  { errorMessage && <p>{ errorMessage }</p> }
                 </div>
               </div>
             }

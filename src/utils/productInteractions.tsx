@@ -219,7 +219,8 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
 
     // Barter contract instance
     const barterContract = new ethers.Contract(BARTER_CONTRACT_ADDRESS, barterContractInfo.abi, signer);
-    
+
+    // Firestore write function
     makePaymentOnOutstandingBalance(docId, paymentInETH);
 
     // WETH addr now approved, trigger the WETH transfer
@@ -248,27 +249,16 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
   }
 }
 
+
 /**
  * 
- * @param nft 
- * @param product 
- * @param ethPrice 
- * @param signer 
+ * @param wallet 
+ * @param nftContract 
+ * @param nftToken 
+ * @returns 
  * 
- * Function decrements balance remaining on the outstanding balance
- * 
+ * Function calls and returns exact amount in Wei remaining on the outstanding balance
  */
- export const updateAndPayOutstandingBalance = async (paymentEth:any, docId:string) => {
-
-  db.collection("outstandingNftBalance").doc(docId)
-    .update({
-      balanceRemaining: FieldValue.increment(-paymentEth),
-     })
-    .then(() => { })
-    .catch((err:Error) => { })
-};
-
-
 export const getExactPaymentleft = async (wallet:string, nftContract: any, nftToken:any) => {
 
   const BUYER_ADDRESS = wallet;
@@ -293,5 +283,4 @@ export const getExactPaymentleft = async (wallet:string, nftContract: any, nftTo
 
   return ethers.utils.formatEther(amountInWei);
   
-
 }
