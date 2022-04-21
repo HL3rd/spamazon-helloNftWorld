@@ -15,22 +15,24 @@ const STORE_WALLET_ADDRESS = "0x2929C3c9805dD1A16546251b9b0B65583FD302c8"
  * Function writes the transaction above to a Firestore document for tracking
  * 
  */
- export const setOutstandingBalanceDoc = async (nft:any, product:Product, ethPrice:any, signer:ethers.providers.JsonRpcSigner) => {
+ export const setOutstandingBalanceDoc = async (nft:any, product:Product, ethPrice:any, buyerAddress:any) => {
 
-  const walletAddress = await signer.getAddress();
   const currTimestamp = getCurrentTimestamp();
 
   const productPriceEth = (product.price / 100) / ethPrice;
 
   const newOutstandingDocRef = db.collection("outstandingNftBalance").doc();
 
+  const buyerAddr = `${buyerAddress}`.toLowerCase();
+
   const nftBalanceData = {
     balanceRemaining: productPriceEth,
     balanceStart: productPriceEth,
-    buyerAddress: walletAddress,
+    buyerAddress: buyerAddr,
     createdAt: currTimestamp,
     id: newOutstandingDocRef.id,
     nftContractAddress: nft.asset_contract.address,
+    nftImageUrl: nft.image_url,
     nftTokenId: nft.token_id,
     product: {
       description: product.description,
@@ -41,7 +43,7 @@ const STORE_WALLET_ADDRESS = "0x2929C3c9805dD1A16546251b9b0B65583FD302c8"
       productImageUrls: product.productImageUrls,
       quantity: product.quantity,
     },
-    sellerAddress: STORE_WALLET_ADDRESS,
+    sellerAddress: STORE_WALLET_ADDRESS.toLowerCase(),
   }
   newOutstandingDocRef.set(nftBalanceData, { merge: true })
     .then(() => { })

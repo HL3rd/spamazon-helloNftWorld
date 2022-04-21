@@ -167,7 +167,7 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
       }
     );
 
-    setOutstandingBalanceDoc(nft, product, ethPrice, signer);
+    setOutstandingBalanceDoc(nft, product, ethPrice, buyerAddr);
 
     return {
       success: true,

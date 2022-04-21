@@ -45,7 +45,7 @@ const ProductPayments: React.FC = () => {
   const accountChangedHandler = async (newAccount:any) => {
 
     setWalletAddress(newAccount);
-    getUserBalance(newAccount.toString());
+    getUserBalance(newAccount);
 
     console.log(`GONNA TEST CASES: ${newAccount} /// VS /// ${newAccount.toString()}`);
 

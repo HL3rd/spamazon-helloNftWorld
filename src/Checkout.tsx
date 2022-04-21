@@ -57,7 +57,7 @@ const Checkout:React.FC = () => {
 
   const accountChangedHandler = async (newAccount:any) => {
     setWalletAddress(newAccount);
-    getUserBalance(newAccount.toString());
+    getUserBalance(newAccount);
 
     if (!callingNfts) {
       const nftResp = await getNFTData(newAccount);
