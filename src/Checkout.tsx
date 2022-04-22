@@ -38,6 +38,7 @@ const Checkout:React.FC = () => {
     // Connect Wallet if needed
     const resp:any = await connectWallet();
     const addr = resp.address;
+    console.log(`BAMMM${addr}`);
     if (addr !== "") {
       accountChangedHandler(addr);
     } else {
@@ -52,7 +53,7 @@ const Checkout:React.FC = () => {
     setWalletAddress(newAccount);
     getUserBalance(newAccount);
 
-    if (!callingNfts) {
+    if (!callingNfts && newAccount) {
       const nftResp = await getNFTData(newAccount);
       setCallingNfts(false);
       setNfts(nftResp);

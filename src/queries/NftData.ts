@@ -21,13 +21,13 @@ export const getNFTData = async (address:any) => {
   // TODO: Use this for production/mainnet API
   // const options = {
   //   method: 'GET',
-  //   headers: {Accept: 'application/json', 'X-API-KEY': ''},
+  //   headers: {Accept: 'application/json', 'X-API-KEY': '6fe67d619aed41f186995586f8ace25e'},
   // };
   const options = {
     method: 'GET',
   };
   
-  const response = await fetch(`https://rinkeby-api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=0`, options);
+  const response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=0&limit=20`, options);
   const data = await response.json();
 
   if (data === undefined || data === null) {
