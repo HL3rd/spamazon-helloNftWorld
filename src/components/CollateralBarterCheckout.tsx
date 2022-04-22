@@ -53,7 +53,7 @@ const CollateralBarterCheckout:React.FC<CollateralBarterCheckoutProps> = ({ sele
             }
             { canPurchase != null && canPurchase && !continueTapped &&
               <div className="first-step">
-                <h3 className="floor-price">Yay! Your Discord mods must be doing great work. Your NFT's floor price is:</h3>
+                <h3 className="floor-price">Yay! Your Discord mods must be doing great work. Your collection's floor price is:</h3>
                 <h3 className="floor-eth">{marketValueETH} ETH = ${marketValueUSD}</h3>
                 <button className="market-btn" onClick={() => setContinueTapped(true)}>Continue</button>
                 <button className="cancel-btn" onClick={() => setSelectedNft(null)}>Cancel</button>
