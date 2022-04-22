@@ -226,8 +226,6 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
  */
  export const repayStore = async (docId:string, nftContractAddress:string, nftTokenId:any, paymentInETH:any, isPayingFull:boolean) => {
 
-  console.log(`IN REPAYSTORE FUNC`);
-
   const buyerAddr = window.ethereum.selectedAddress;
 
   if (!buyerAddr) {
@@ -256,8 +254,6 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
 
     // Barter contract instance
     const barterContract = new ethers.Contract(BARTER_CONTRACT_ADDRESS, barterContractInfo.abi, signer);
-
-    console.log(`FINNA CALL barter.sol repay func`);
 
     // WETH addr now approved, trigger the WETH transfer
     const paymentTx = await barterContract.repay(

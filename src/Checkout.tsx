@@ -79,10 +79,10 @@ const Checkout:React.FC = () => {
   }
 
   // Check if user changes their connected account
-  if (window !== undefined) { (window as any).ethereum.on('accountChanged', accountChangedHandler) };
+  if ((window as any).ethereum !== undefined) { (window as any).ethereum.on('accountChanged', accountChangedHandler) };
 
   // If user changes testnets or test to devnet, reload site
-  if (window !== undefined) { (window as any).ethereum.on('chainChanged', chainChangedHandler) };
+  if ((window as any).ethereum !== undefined) { (window as any).ethereum.on('chainChanged', chainChangedHandler) };
 
   // NFTs will not show until ETH price is set
   const callEthPriceCheck = async () => {
@@ -94,6 +94,14 @@ const Checkout:React.FC = () => {
   // Grabs the product id in the path name and calls the product
   const renderCurrentProduct = async () => {
     console.log(`PRODUCT ID: ${productId}`);
+    if (productId !== undefined) {
+      // Query product in Firestore
+
+      // If query returns nothing --> Home
+
+    } else {
+      // Home
+    }
   };
 
   const imageClick = (clickedUrl:string) => {
