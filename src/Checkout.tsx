@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { ethers } from 'ethers';
 import { connectWallet } from './utils/interact';
 import { formatStripeToUSDString } from './utils/format';
@@ -13,20 +14,20 @@ import PurchaseModal from './components/PurchaseModal';
 
 const Checkout:React.FC = () => {
 
-  const testProduct:Product = {
+  let { productId } = useParams();
+
+  const spamCostume:Product = {
     description: 'A revolutionary new product: the spam costume. This amazing invention is guaranteed to make you the life of the party. So what are you waiting for?! Buy it!',
     productImageUrls: ['https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fspam_apparel_p4%201.png?alt=media&token=88303656-b08d-41d6-af49-c241aee7ea22', 'https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fspam_costume.png?alt=media&token=70beb50b-9a28-42f2-bbfa-c7c2ecb1ed9e', 'https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fspam_apparel_p3%201.png?alt=media&token=447497ba-4dfb-44ee-b258-4d2faab0db74'],
-    // productImageUrls: ['https://images-na.ssl-images-amazon.com/images/I/91TvWl33h4L.jpg', "https://i.kym-cdn.com/entries/icons/mobile/000/006/026/NOTSUREIF.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Giraffa_camelopardalis_angolensis.jpg/1024px-Giraffa_camelopardalis_angolensis.jpg"],
-    id: '00000',
+    id: 'jx7BZ9Ds5HyRiqOrw5cm',
     isListed: true,
     name: 'Spam Costume',
-    //name: 'Guide to the Universe Book',
     price: 10000,
     quantity: 50,
   };
 
   // Front end state vars
-  const [currentImage, setCurrentImage] = useState(testProduct.productImageUrls[0]);
+  const [currentImage, setCurrentImage] = useState(spamCostume.productImageUrls[0]);
   // Wallet state vars
   const [errorMessage, setErrorMessage] = useState('');
   const [walletAddress, setWalletAddress] = useState(null);
@@ -69,7 +70,7 @@ const Checkout:React.FC = () => {
   const getUserBalance = (address:any) => {
     (window as any).ethereum.request({method: 'eth_getBalance', params: [address, 'latest']})
       .then((balance:any) => {
-          setUserBalance(ethers.utils.formatEther(balance));
+        setUserBalance(ethers.utils.formatEther(balance));
       })
   }
 
@@ -89,11 +90,18 @@ const Checkout:React.FC = () => {
     setETHPrice(price);
   };
 
+
+  // Grabs the product id in the path name and calls the product
+  const renderCurrentProduct = async () => {
+    console.log(`PRODUCT ID: ${productId}`);
+  };
+
   const imageClick = (clickedUrl:string) => {
     setCurrentImage(clickedUrl);
   };
 
   useEffect(() => {
+    renderCurrentProduct();
     callEthPriceCheck();
   }, []);
 
@@ -104,7 +112,7 @@ const Checkout:React.FC = () => {
         <div className="sell-cols">
 
           <div className="far-left-col">
-            { testProduct.productImageUrls.map((url:string, index:any) => {
+            { spamCostume.productImageUrls.map((url:string, index:any) => {
               return <img key={index} onClick={() => imageClick(url)} className="highlight-img" alt="preview-img" width="100px" height="100px" src={url} />
             })}
           </div>
@@ -114,13 +122,13 @@ const Checkout:React.FC = () => {
           </div>
 
           <div className="center-right-col">
-            <h2 className="product-name">{testProduct.name}</h2>
-            <p className="product-price">{formatStripeToUSDString(testProduct.price)}</p>
-            <p className="product-description">{testProduct.description}</p>
+            <h2 className="product-name">{spamCostume.name}</h2>
+            <p className="product-price">{formatStripeToUSDString(spamCostume.price)}</p>
+            <p className="product-description">{spamCostume.description}</p>
           </div>
 
           <div className="far-right-col">
-            <p style={{ textAlign: 'left' }}>{formatStripeToUSDString(testProduct.price)}</p>
+            <p style={{ textAlign: 'left' }}>{formatStripeToUSDString(spamCostume.price)}</p>
             <p style={{ textAlign: 'left' }}>FREE delivery to<strong> the Metaverse.</strong></p>
             <button disabled={ethPrice == null} onClick={() => checkoutClicked(true)} className="buy-btn">One-click barter</button>
             <button disabled={ethPrice == null} onClick={() => checkoutClicked(false)} className="sell-btn">Dump now, pay later</button>
@@ -139,7 +147,7 @@ const Checkout:React.FC = () => {
         <div id="purchaseOverlay">
           <PurchaseModal
             selectedNft={selectedNft}
-            product={testProduct}
+            product={spamCostume}
             ethPrice={ethPrice}
             isInstantBarter={isInstantBarter}
             setSelectedNft={setSelectedNft}
