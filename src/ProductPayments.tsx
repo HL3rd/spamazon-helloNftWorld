@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Row, Col } from 'react-bootstrap';
-import { OutstandingNftBalance } from './constants/class-objects';
+import { Row, Col, ProgressBar } from 'react-bootstrap';
 
-import { queryOutstandingNftBalances } from './queries/FirebaseQueries';
+import { db } from './utils/firebase';
 import { connectWallet } from './utils/interact';
 import { repayStore, getExactPaymentleft } from './utils/productInteractions';
+import { getETHPriceInUSD } from './queries/NftData';
+import { formatStripeToUSDString, formatETHToUSDString } from './utils/format';
 
-import './App.css';
-import { ProgressBar } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { formatStripeToUSDString } from './utils/format';
+import { OutstandingNftBalance } from './constants/class-objects';
+
 import Navbar from './components/Navbar';
+import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const ProductPayments: React.FC = () => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [walletAddress, setWalletAddress] = useState(null);
   const [userBalance, setUserBalance] = useState('');
+  const [ethPrice, setETHPrice] = useState(null);
 
   // Balances consts
   const [callingBalances, setCallingBalances] = useState(false);
@@ -25,53 +27,76 @@ const ProductPayments: React.FC = () => {
   const [currentOustandingBalance, setCurrentOutstandingBalance] = useState<OutstandingNftBalance|null>();
 
   // payment
-  const [paymentAmount, setPaymentAmount] = useState(0);
-
-  const testOutstandingNftBalance: OutstandingNftBalance = {
-    balanceRemaining: 1.0,
-    balanceStart: 2.0,
-    buyerAddress: "0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6",
-    createdAt: 1649908881,
-    id: "00000",
-    nftContractAddress: "0x08207fe7f1f7c9f1c39e4720b9f7bfe2afd01907",
-    nftTokenId: 11,
-    product: {
-      description: 'A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product',
-      productImageUrls: ['https://images-na.ssl-images-amazon.com/images/I/91TvWl33h4L.jpg', "https://i.kym-cdn.com/entries/icons/mobile/000/006/026/NOTSUREIF.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Giraffa_camelopardalis_angolensis.jpg/1024px-Giraffa_camelopardalis_angolensis.jpg"],
-      id: "00000",
-      isListed: true,
-      name: 'Guide to the Universe Book',
-      price: 10000,
-      quantity: 100,
-    },
-    sellerAddress: "0x2929C3c9805dD1A16546251b9b0B65583FD302c8"
-  }
+  const [paymentAmount, setPaymentAmount] = useState<number|undefined>(undefined);
+  const [isPayingFull, setIsPayingFull] = useState(false);
 
   // First function called in useEffect
   const connectWalletAndQueryBalances = async () => {
-    console.log(`Connecting wallet and querying balances`);
+
     // Connect Wallet if needed
     const resp:any = await connectWallet();
     const addr = resp.address;
-    console.log(`ADDRESSS ${addr}`);
+
     if (addr !== "") {
       accountChangedHandler(addr);
     } else {
-      setErrorMessage(resp.status);
+      setErrorMessage(`Success! ${resp.status}`);
     }
   }
+
+  const callEthPriceCheck = async () => {
+    const price = await getETHPriceInUSD();
+    setETHPrice(price);
+  };
 
   const accountChangedHandler = async (newAccount:any) => {
 
     setWalletAddress(newAccount);
-    getUserBalance(newAccount.toString());
+    getUserBalance(newAccount);
 
     if (!callingBalances) {
-      console.log(`SHOULD CALLLL`)
-      const balancesArray = await queryOutstandingNftBalances(newAccount);
+      queryOutstandingNftBalances(newAccount);
       setCallingBalances(false);
-      setOutstandingBalancesArr(balancesArray);
     }
+  }
+
+
+  /**
+   * 
+   * @param walletAddress 
+   * @returns 
+   * 
+   * Query outstanding balance objects
+   * 
+   */
+  const queryOutstandingNftBalances = (walletAddress:string) => {
+
+    db.collection('outstandingNftBalance')
+      .where('buyerAddress', '==', walletAddress)
+      .where('balanceRemaining', '>', 0)
+      .orderBy('balanceRemaining')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot((outstandingPaymentsSnapshot) => {
+        const outstandingPaymentsArray = outstandingPaymentsSnapshot.docs.map((doc) => new OutstandingNftBalance(doc.id, doc.data()))
+        setOutstandingBalancesArr(outstandingPaymentsArray);
+      });
+  }
+
+  const setCurrentBalanceObj = async (currentBalanceObj:OutstandingNftBalance) => {
+
+    setCurrentOutstandingBalance(currentBalanceObj);
+
+    db.collection('outstandingNftBalance')
+      .doc(currentBalanceObj.id)
+      .onSnapshot((balanceObjSnap) => {
+        const newObj = new OutstandingNftBalance(balanceObjSnap.id, balanceObjSnap.data());
+        setCurrentOutstandingBalance(newObj);
+
+        if (newObj.balanceRemaining == 0) {
+          setPaymentAmount(undefined);
+        }
+
+      });
   }
 
   const getUserBalance = (address:any) => {
@@ -81,50 +106,131 @@ const ProductPayments: React.FC = () => {
       })
   }
 
-  // Selected an outstanding balance to pay
-  const selectedOutstandingBalance = async (oustandingNftBalance:OutstandingNftBalance) => {
-    console.log('BAAAAAAAAAAMMMMMMMMM', (oustandingNftBalance.balanceStart -oustandingNftBalance.balanceRemaining) / oustandingNftBalance.balanceStart);
-    setCurrentOutstandingBalance(oustandingNftBalance);
+  /**
+   * 
+   * @returns 
+   * 
+   * Gets percentage % of remaining balance paid off
+   */
+  const getOutstandingBalanacePaidPercent = () => {
+    if (!currentOustandingBalance) return;
+    return (((currentOustandingBalance.balanceStart - currentOustandingBalance.balanceRemaining) / currentOustandingBalance.balanceStart) * 100);
   }
 
-  // Pay this outstanding object
-  const triggeredPaymentToOutstandingBalance = async (event:any) => {
+  /**
+   * 
+   * @returns 
+   * 
+   * Live state change register as user enters payment amount
+   */
+  const enteringPaymentAmount = (e:any) => {
+
+    let intendedAmount = e.target.value;
+    
+    if (intendedAmount < 0) {
+      setErrorMessage('Please enter a value greater than zero.');
+      return;
+    }
+
+    setErrorMessage('');
+
+    if (intendedAmount >= currentOustandingBalance!.balanceRemaining) {
+      // Activate Pay in full state
+      setIsPayingFull(true);
+      setPaymentAmount(currentOustandingBalance!.balanceRemaining);
+      setErrorMessage(`You cannot pay more than what you owe.`);
+    } else {
+      // Else, continue
+      setIsPayingFull(false);
+      setPaymentAmount(intendedAmount);
+    }
+
+  }
+
+  /**
+   * 
+   * @param event 
+   * @returns 
+   * 
+   * Pay this outstanding object
+   */
+  const payOutstandingBalance = async (event:any) => {
 
     event.preventDefault();
 
-    const amountPaid = event.target[0].value;
-    console.log(`PAYINH:::::: ${amountPaid}`);
+    if (!currentOustandingBalance) {
+      setErrorMessage(`Please select and outstanding balance item first.`);
+      return;
+    }
 
-    const exactAmount = await getExactPaymentleft("0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6", currentOustandingBalance!.nftContractAddress, currentOustandingBalance!.nftTokenId);
+    console.log(`PAYING THIS MUCH:::::: ${Number(paymentAmount)}`);
 
-    await repayStore(currentOustandingBalance!.nftContractAddress, currentOustandingBalance!.nftTokenId, exactAmount);
+    var actualPayment = paymentAmount;
+
+    const nftContractAddr = currentOustandingBalance!.nftContractAddress;
+    const nftTokenId = currentOustandingBalance!.nftTokenId;
+
+    if (isPayingFull) {
+      actualPayment = Number(await getExactPaymentleft("0x52554BfE4baC4aE605Af27A2e131480F2D219Fe6", nftContractAddr, nftTokenId));
+    }
+
+    // Amount in ETH is returned, might be a chance that we need Wei
+    const balanceDocId = currentOustandingBalance!.id;
+
+    const repayResp = await repayStore(balanceDocId, nftContractAddr, nftTokenId, paymentAmount, isPayingFull);
+
+    if (!repayResp.success) {
+      setErrorMessage(repayResp.status);
+    } else {
+      setPaymentAmount(undefined);
+      setErrorMessage(repayResp.status);
+    }
+
+  }
+
+  const enterRemainginBalance = async () => {
+
+    if (!currentOustandingBalance) {
+      setErrorMessage(`Please select an outstanding balance before proceeding`);
+      return;
+    }
+
+    if (!walletAddress) {
+      setErrorMessage(`Please select a valid ETH wallet on Rinkeby before proceeding`);
+      return;
+    }
+
+    setIsPayingFull(true);
+
+    const nftContractAddr = currentOustandingBalance.nftContractAddress;
+    const nftTokenId = currentOustandingBalance.nftTokenId;
+    
+    const amountResp = await getExactPaymentleft(walletAddress, nftContractAddr, nftTokenId);
+
+    setPaymentAmount(Number(amountResp));
 
   }
 
   useEffect(() => {
     connectWalletAndQueryBalances();
+    callEthPriceCheck();
   }, [])
 
   return (
-    <body>
-      <Navbar walletAddress={"a"} userBalance={"a"} errorMessage={"a"} /> 
-      {/* walletAddress={walletAddress} userBalance={userBalance} errorMessage={errorMessage} /> */}
-
+    <div>
+      <Navbar walletAddress={walletAddress} userBalance={userBalance} title={"Account & Payments"} errorMessage={""} />
       <div className="payments">
         <Row>
-          {/* fills about 25% on large screens and 100% on small */}
-          <Col xs={12} md={3} className="left-col">
+          <Col xs={12} md={3} className="pay-left-col">
             <Row>
               <h1>Outstanding Balances</h1>
               { oustandingBalancesArr.length > 0 &&
-              <div className="nft-content">
+              <div className="outstanding-items">
                 { oustandingBalancesArr.map((balanceObj:OutstandingNftBalance, index:any) => {
                   return (
-                    <a onClick={() => { console.log(JSON.stringify(balanceObj)); selectedOutstandingBalance(balanceObj)}}>
-                      <div className="balance-box" key={index}>
-                        <div className="balance-img-div">
-                          <img className="balance-img" src={balanceObj.product.productImageUrls[0]} />
-                        </div>
+                    <a key={index} onClick={() => { setCurrentBalanceObj(balanceObj) }} className="balance-box-link">
+                      <div className="balance-box">
+                        <img className="balance-img" src={balanceObj.product.productImageUrls[0]} />
                         <div className="balance-info">
                           <p className="balance-title">{balanceObj.product.name}</p>
                           <p className="balance-amount">Remaining Balance: {balanceObj.balanceRemaining} </p>
@@ -136,88 +242,52 @@ const ProductPayments: React.FC = () => {
               </div>
               }
             </Row>
-
-            {/* <Row>
-              <div className="balance-box-unselected">
-                <div className="balance-img">
-                  <img />
-                </div>
-                <div className="balance-info">
-                  <p className="balance-title">Universe Book</p>
-                  <p className="balance-amount">Remaining Balance: </p>
-                </div>
-              </div>
-            </Row>
-
-            <Row>
-              <div className="balance-box-unselected">
-                <div className="balance-img">
-                  <img />
-                </div>
-                <div className="balance-info">
-                  <p className="balance-title">Universe Book</p>
-                  <p className="balance-amount">Remaining Balance: </p>
-                </div>
-              </div>
-            </Row>
-
-            <Row>
-              <div className="balance-box-unselected">
-                <div className="balance-img">
-                  <img />
-                </div>
-                <div className="balance-info">
-                  <p className="balance-title">Universe Book</p>
-                  <p className="balance-amount">Remaining Balance: </p>
-                </div>
-              </div>
-            </Row> */}
           </Col>
-          <Col xs={12} md={6} className="right-col">
+
+          <Col xs={12} md={6} className="pay-right-col">
             { oustandingBalancesArr.length <= 0 &&
-                <h3 className="selected-title">Looks like you have no oustanding balances!</h3>
+              <h3 className="h3-subtitle">Looks like you have no oustanding balances!</h3>
+            }
+            { oustandingBalancesArr.length > 0 && !currentOustandingBalance &&
+              <h3 className="h3-subtitle">Select an outstanding balance to begin paying it off!</h3>
             }
             { currentOustandingBalance &&
-            <div className="selected-box">
-              <div className="selected-img-div">
-                <img className="selected-img" alt={currentOustandingBalance.id} src={currentOustandingBalance.product.productImageUrls[0]} />
-              </div>
-
-              <div className="right-side-col">
-
-                <div className="selected-info">
+              <div className="selected-box">
+                <div className="selected-img-div">
+                  <img className="selected-img" alt={currentOustandingBalance.id} src={currentOustandingBalance.product.productImageUrls[0]} />
+                </div>
+                <div className="selected-info-div">
                   <h3 className="selected-title">{currentOustandingBalance.product.name}</h3>
-                  <p className="selected-amount">Remaining Balance: {currentOustandingBalance.balanceRemaining} ETH</p>
-
+                  <p className="selected-subtitle">Remaining Balance: {currentOustandingBalance.balanceRemaining} WETH</p>
+                  <p className="selected-subtitle-usd">{formatETHToUSDString(currentOustandingBalance.balanceRemaining, ethPrice)}</p>
                   <div className="progressBar">
                     <ProgressBar
-                      now={((currentOustandingBalance.balanceStart - currentOustandingBalance.balanceRemaining)  / currentOustandingBalance.balanceStart) * 100}
-                      label={`${((currentOustandingBalance.balanceStart -currentOustandingBalance.balanceRemaining) / currentOustandingBalance.balanceStart) * 100}% already paid`}
+                      now={ getOutstandingBalanacePaidPercent() }
                     />
                   </div>
-
-                  <form className="form-input" onSubmit={(e:any) => triggeredPaymentToOutstandingBalance(e)}>
+                  <form className="form-input" onSubmit={(e:any) => payOutstandingBalance(e)}>
                     <p className="selected-amount-input">Amount to Pay:</p>
                     <input
-                      type="text"
-                      placeholder="e.g. 0.5"
-                      // maxLength="18"
-                      // onChange={(event) => setPayment(event.target.value)}
+                      type="number"
+                      onChange={(event) => enteringPaymentAmount(event)}
+                      step="0.000001"
+                      value={paymentAmount}
                     />
-                    <button className="pay-btn">Pay</button>
+                    <p>{ formatETHToUSDString((paymentAmount ? paymentAmount : 0), ethPrice) }</p>
+                    <div className="pay-btns-div">
+                      <button className="pay-btn">Pay</button>
+                      <a className="pay-full-btn" onClick={() => enterRemainginBalance()}>Pay full balance</a>
+                    </div>
                   </form>
-                  
+                  { errorMessage && <p>{ errorMessage }</p> }
                 </div>
-                
               </div>
-            </div>
             }
           </Col>
+
         </Row>
       </div>
-
-      
-    </body>
+    </div>
   );
 };
 

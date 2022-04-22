@@ -1,31 +1,69 @@
 import { db, FieldValue } from '../utils/firebase';
-import { OutstandingNftBalance } from '../constants/class-objects';
+import { OutstandingNftBalance, Product } from '../constants/class-objects';
+import { getCurrentTimestamp } from '../utils/format';
 
-export const queryOutstandingNftBalances = async (walletAddress:string) => {
+const STORE_WALLET_ADDRESS = "0x2929C3c9805dD1A16546251b9b0B65583FD302c8"
 
-  console.log(`CALLING WITH THIS ADDRESS: ${walletAddress}`);
+/**
+ * 
+ * @param nft 
+ * @param product 
+ * @param ethPrice 
+ * @param signer 
+ * 
+ * Function writes the transaction above to a Firestore document for tracking
+ * 
+ */
+ export const setOutstandingBalanceDoc = async (nft:any, product:Product, ethPrice:any, buyerAddress:any) => {
 
-  const querySnapshot = await db.collection('outstandingNftBalance')
-                      .where('buyerAddress', '==', walletAddress)
-                      .where('balanceRemaining', '>', 0)
-                      .orderBy('balanceRemaining')
-                      .orderBy('createdAt')
-                      .get();
-                      
-  console.log(`${JSON.stringify(querySnapshot.docs)}`);
+  const currTimestamp = getCurrentTimestamp();
 
-  const outstandingPaymentsArray = querySnapshot.docs.map((doc) => new OutstandingNftBalance(doc.id, doc.data()))
+  const productPriceEth = (product.price / 100) / ethPrice;
 
-  return outstandingPaymentsArray;
+  const newOutstandingDocRef = db.collection("outstandingNftBalance").doc();
 
-}
+  const buyerAddr = `${buyerAddress}`.toLowerCase();
 
-export const makePaymentOnOutstandingBalance = async (docId: string, amount:number) => {
+  const nftContractAddr = (nft.asset_contract.address).toLowerCase()
 
-  const docRef = (await db.collection('nftOutstandingBalance').doc(docId).get()).ref
+  const nftBalanceData = {
+    balanceRemaining: productPriceEth,
+    balanceStart: productPriceEth,
+    buyerAddress: buyerAddr,
+    createdAt: currTimestamp,
+    id: newOutstandingDocRef.id,
+    nftContractAddress: nftContractAddr,
+    nftImageUrl: nft.image_url,
+    nftTokenId: nft.token_id,
+    product: {
+      description: product.description,
+      id: product.id,
+      isListed: product.isListed,
+      name: product.name,
+      price: product.price,
+      productImageUrls: product.productImageUrls,
+      quantity: product.quantity,
+    },
+    sellerAddress: STORE_WALLET_ADDRESS.toLowerCase(),
+  }
+  newOutstandingDocRef.set(nftBalanceData, { merge: true })
+    .then(() => { })
+    .catch((err:Error) => { })
+};
 
-  docRef.update({balanceRemaining: FieldValue.increment(-amount)})
-    .then(() => {
+/**
+ * 
+ * @param docId 
+ * @param amount 
+ */
+
+export const makePaymentOnOutstandingBalance = async (docId: string, amount:number, isPayingFull:boolean) => {
+
+  const docRef = (await db.collection('outstandingNftBalance').doc(docId).get()).ref
+
+  var query = (isPayingFull) ?  docRef.update({balanceRemaining: 0}) : docRef.update({balanceRemaining: FieldValue.increment(-amount)})
+  
+  query.then(() => {
       console.log(`Succesfully made payment in Firestore of ${amount} ETH`);
     })
     .catch((err) => {

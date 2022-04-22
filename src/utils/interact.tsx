@@ -80,7 +80,6 @@ export const connectWallet = async () => {
         status: "👆🏽 Write a message in the text-field above.",
         address: addressArray[0],
       };
-      console.log(`SHOULD RETURN!!`);
       return obj;
     } catch (err:any) {
       console.log(`err: ${err}`);

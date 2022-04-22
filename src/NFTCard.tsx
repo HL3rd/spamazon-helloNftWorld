@@ -41,10 +41,6 @@ const NFTCard:React.FC<NFTCardProps> = ({ nft, selectedNft, setSelectedNft }) =>
             </Col>
           </Row>
         </div>
-
-
-
-
       </div> 
       <button disabled={selectedNft != null} className="sell-btn" onClick={() => setSelectedNft(nft) }>
         Barter Me

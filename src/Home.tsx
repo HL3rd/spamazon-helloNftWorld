@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import { Product } from './constants/class-objects';
 
 const Home = () => {
+
   const testProduct:Product = {
     description: 'A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product A new revolutionary product',
     productImageUrls: ['https://images-na.ssl-images-amazon.com/images/I/91TvWl33h4L.jpg', "https://i.kym-cdn.com/entries/icons/mobile/000/006/026/NOTSUREIF.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Giraffa_camelopardalis_angolensis.jpg/1024px-Giraffa_camelopardalis_angolensis.jpg"],
@@ -16,8 +17,8 @@ const Home = () => {
 
 
   return (
-    <body>
-      <Navbar walletAddress={"a"} userBalance={"a"} errorMessage={"a"} /> 
+    <div>
+      <Navbar walletAddress={"a"} userBalance={"a"} title={"Shopping"} errorMessage={"a"} /> 
       {/* walletAddress={walletAddress} userBalance={userBalance} errorMessage={errorMessage} /> */}
       
 
@@ -29,7 +30,7 @@ const Home = () => {
             <div className="box-image">
               <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fjuicero.png?alt=media&token=7e38e04d-fa93-4ab8-bb12-f30b10e63616"/>
             </div>
-            <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
+            <p><a className="product-link" href="/checkout/vpF5nzbROPXSsIQVDUM6">Click here to view our product</a></p>
           </div>
 
           <div className="home-box">
@@ -37,7 +38,7 @@ const Home = () => {
             <div className="box-image">
               <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fspam_costume.png?alt=media&token=70beb50b-9a28-42f2-bbfa-c7c2ecb1ed9e"/>
             </div>
-            <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
+            <p><a className="product-link" href="/checkout/jx7BZ9Ds5HyRiqOrw5cm">Click here to view our product</a></p>
           </div>
 
           <div className="home-box">
@@ -45,7 +46,7 @@ const Home = () => {
             <div className="box-image">
               <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Frobot.png?alt=media&token=26528dbb-371d-4067-b3cd-5deb9d32cac0"/>
             </div>
-            <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
+            <p><a className="product-link" href="/checkout/hsfVKQyy5WCJRQig97EP">Click here to view our product</a></p>
           </div>
 
           <div className="home-box">
@@ -73,7 +74,7 @@ const Home = () => {
             <div className="box-image">
               <img className="box-image-link" src="https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2FGroup%201.png?alt=media&token=057e2b8b-1e88-485d-b87d-cdf732d9a004"/>
             </div>
-            <p><a className="product-link" href="/checkout">Click here to view our product</a></p>
+            <p><a className="product-link" href="/checkout/">Click here to view our product</a></p>
           </div>
 
           <div className="home-box">
@@ -94,7 +95,7 @@ const Home = () => {
         </div>
 
       </div>
-    </body>
+    </div>
     
   );
 }
