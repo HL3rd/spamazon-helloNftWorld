@@ -488,8 +488,13 @@ a:hover {
 
 .selected-subtitle {
   text-align: left;
-  margin: 0;
-  margin-bottom: 2vh;
+  margin: 0 0 2vh 0;
+  padding: 0;
+}
+
+.selected-subtitle-usd {
+  text-align: center;
+  margin: 0 0 2vh 0;
   padding: 0;
 }
 
@@ -508,7 +513,7 @@ a:hover {
 
 .progressBar {
   margin: 0;
-  margin-left: 0;
+  margin-left: 5px;
   margin-bottom: 2vh;
   text-align: left;
 }

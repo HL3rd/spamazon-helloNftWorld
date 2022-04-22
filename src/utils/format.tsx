@@ -19,6 +19,19 @@ export const formatStripeToUSDString = (stripeInt:number) => {
         (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "")}`;
 }
 
+export const formatETHToUSDString = (ethAmount:number, ethPrice:any) => {
+  const decPlaces = 2;
+  const decSep = ".";
+  const thouSep = ",";
+  var number:any = `${ethAmount * (ethPrice)}`;
+  var i:any = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));
+  var j:any = (j = i.length) > 3 ? j % 3 : 0;
+
+  return `$${(j ? i.substr(0, j) + thouSep : "") +
+        i.substr(j).replace(/(\decSep{3})(?=\decSep)/g, "$1" + thouSep) +
+        (decPlaces ? decSep + Math.abs(number - i).toFixed(decPlaces).slice(2) : "")}`;
+}
+
 export const formatShortenContract = (longContractAddress:string) => {
   const decimals = "...";
   var splitContract = longContractAddress.split("");
@@ -29,10 +42,3 @@ export const formatShortenContract = (longContractAddress:string) => {
 
   return `0x${shortContractAddress}`
 }
-
-// export const formatStripe = (stripeInt:number) => {
-
-
-
-
-// }

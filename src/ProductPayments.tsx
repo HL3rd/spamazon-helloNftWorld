@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Row, Col } from 'react-bootstrap';
-import { OutstandingNftBalance } from './constants/class-objects';
+import { Row, Col, ProgressBar } from 'react-bootstrap';
 
-import { queryOutstandingNftBalances } from './queries/FirebaseQueries';
+import { db } from './utils/firebase';
 import { connectWallet } from './utils/interact';
 import { repayStore, getExactPaymentleft } from './utils/productInteractions';
+import { getETHPriceInUSD } from './queries/NftData';
+import { formatStripeToUSDString, formatETHToUSDString } from './utils/format';
 
-import './App.css';
-import { ProgressBar } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { formatStripeToUSDString } from './utils/format';
+import { OutstandingNftBalance } from './constants/class-objects';
+
 import Navbar from './components/Navbar';
+import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const ProductPayments: React.FC = () => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [walletAddress, setWalletAddress] = useState(null);
   const [userBalance, setUserBalance] = useState('');
+  const [ethPrice, setETHPrice] = useState(null);
 
   // Balances consts
   const [callingBalances, setCallingBalances] = useState(false);
@@ -25,7 +27,7 @@ const ProductPayments: React.FC = () => {
   const [currentOustandingBalance, setCurrentOutstandingBalance] = useState<OutstandingNftBalance|null>();
 
   // payment
-  const [paymentAmount, setPaymentAmount] = useState(0);
+  const [paymentAmount, setPaymentAmount] = useState<number|undefined>(undefined);
   const [isPayingFull, setIsPayingFull] = useState(false);
 
   // First function called in useEffect
@@ -38,9 +40,14 @@ const ProductPayments: React.FC = () => {
     if (addr !== "") {
       accountChangedHandler(addr);
     } else {
-      setErrorMessage(resp.status);
+      setErrorMessage(`Success! ${resp.status}`);
     }
   }
+
+  const callEthPriceCheck = async () => {
+    const price = await getETHPriceInUSD();
+    setETHPrice(price);
+  };
 
   const accountChangedHandler = async (newAccount:any) => {
 
@@ -48,10 +55,48 @@ const ProductPayments: React.FC = () => {
     getUserBalance(newAccount);
 
     if (!callingBalances) {
-      const balancesArray = await queryOutstandingNftBalances(newAccount);
+      queryOutstandingNftBalances(newAccount);
       setCallingBalances(false);
-      setOutstandingBalancesArr(balancesArray);
     }
+  }
+
+
+  /**
+   * 
+   * @param walletAddress 
+   * @returns 
+   * 
+   * Query outstanding balance objects
+   * 
+   */
+  const queryOutstandingNftBalances = (walletAddress:string) => {
+
+    db.collection('outstandingNftBalance')
+      .where('buyerAddress', '==', walletAddress)
+      .where('balanceRemaining', '>', 0)
+      .orderBy('balanceRemaining')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot((outstandingPaymentsSnapshot) => {
+        const outstandingPaymentsArray = outstandingPaymentsSnapshot.docs.map((doc) => new OutstandingNftBalance(doc.id, doc.data()))
+        setOutstandingBalancesArr(outstandingPaymentsArray);
+      });
+  }
+
+  const setCurrentBalanceObj = async (currentBalanceObj:OutstandingNftBalance) => {
+
+    setCurrentOutstandingBalance(currentBalanceObj);
+
+    db.collection('outstandingNftBalance')
+      .doc(currentBalanceObj.id)
+      .onSnapshot((balanceObjSnap) => {
+        const newObj = new OutstandingNftBalance(balanceObjSnap.id, balanceObjSnap.data());
+        setCurrentOutstandingBalance(newObj);
+
+        if (newObj.balanceRemaining == 0) {
+          setPaymentAmount(undefined);
+        }
+
+      });
   }
 
   const getUserBalance = (address:any) => {
@@ -136,6 +181,9 @@ const ProductPayments: React.FC = () => {
 
     if (!repayResp.success) {
       setErrorMessage(repayResp.status);
+    } else {
+      setPaymentAmount(undefined);
+      setErrorMessage(repayResp.status);
     }
 
   }
@@ -165,6 +213,7 @@ const ProductPayments: React.FC = () => {
 
   useEffect(() => {
     connectWalletAndQueryBalances();
+    callEthPriceCheck();
   }, [])
 
   return (
@@ -179,7 +228,7 @@ const ProductPayments: React.FC = () => {
               <div className="outstanding-items">
                 { oustandingBalancesArr.map((balanceObj:OutstandingNftBalance, index:any) => {
                   return (
-                    <a key={index} onClick={() => { setCurrentOutstandingBalance(balanceObj) }} className="balance-box-link">
+                    <a key={index} onClick={() => { setCurrentBalanceObj(balanceObj) }} className="balance-box-link">
                       <div className="balance-box">
                         <img className="balance-img" src={balanceObj.product.productImageUrls[0]} />
                         <div className="balance-info">
@@ -210,10 +259,10 @@ const ProductPayments: React.FC = () => {
                 <div className="selected-info-div">
                   <h3 className="selected-title">{currentOustandingBalance.product.name}</h3>
                   <p className="selected-subtitle">Remaining Balance: {currentOustandingBalance.balanceRemaining} WETH</p>
+                  <p className="selected-subtitle-usd">{formatETHToUSDString(currentOustandingBalance.balanceRemaining, ethPrice)}</p>
                   <div className="progressBar">
                     <ProgressBar
                       now={ getOutstandingBalanacePaidPercent() }
-                      label={`${ getOutstandingBalanacePaidPercent() }% already paid`}
                     />
                   </div>
                   <form className="form-input" onSubmit={(e:any) => payOutstandingBalance(e)}>
@@ -221,8 +270,10 @@ const ProductPayments: React.FC = () => {
                     <input
                       type="number"
                       onChange={(event) => enteringPaymentAmount(event)}
+                      step="0.000001"
                       value={paymentAmount}
                     />
+                    <p>{ formatETHToUSDString((paymentAmount ? paymentAmount : 0), ethPrice) }</p>
                     <div className="pay-btns-div">
                       <button className="pay-btn">Pay</button>
                       <a className="pay-full-btn" onClick={() => enterRemainginBalance()}>Pay full balance</a>
