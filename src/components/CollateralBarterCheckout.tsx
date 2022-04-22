@@ -3,6 +3,7 @@ import { Row, Col } from 'react-bootstrap';
 import { Product } from '../constants/class-objects';
 
 import { canPurchaseCheck, collateralizeNFT } from '../utils/productInteractions';
+import { formatStripeToUSDString } from '../utils/format';
 
 interface CollateralBarterCheckoutProps {
   selectedNft: any,
@@ -23,10 +24,10 @@ const CollateralBarterCheckout:React.FC<CollateralBarterCheckoutProps> = ({ sele
   const checkMarketValue = async () => {
 
     setCheckingMarketValue(true);
-    const checkResp = await canPurchaseCheck(selectedNft, product, ethPrice);
+    const checkResp = await canPurchaseCheck(selectedNft, product, ethPrice, true);
     setCheckingMarketValue(false);
 
-    setCanPurchase(checkResp.floorPriceUSD > 0)
+    setCanPurchase(checkResp.success)
 
     setMarketValueETH(checkResp.floorPriceETH);
     setMarketValueUSD(checkResp.floorPriceUSD);
@@ -45,7 +46,7 @@ const CollateralBarterCheckout:React.FC<CollateralBarterCheckoutProps> = ({ sele
           <Col>
             { canPurchase == null &&
               <div className="first-step">
-                <p className="put-up">Put up your {selectedNft.name} NFT as collateral to buy {product.name} if the current market value is higher.</p>
+                <p className="put-up">Put up your {selectedNft.name} NFT as collateral to buy <strong>{product.name}</strong> if the current market value is higher than <strong>{formatStripeToUSDString(product.price * 0.5)}</strong>.</p>
                 <p className="pay-off">Pay off the balance in WETH later.</p>
                 <p className="pay-off-floor">Floor price must be non-zero to collateralize.</p>
                 <button className="market-btn" disabled={checkingMarketValue} onClick={() => checkMarketValue()}>Check Market Value</button>
@@ -62,14 +63,14 @@ const CollateralBarterCheckout:React.FC<CollateralBarterCheckoutProps> = ({ sele
             { canPurchase != null && !canPurchase &&
               <div className="first-step">
                 <h3 className="floor-price">Sorry, there's no market for your NFT. The floor price is 0 ETH</h3>
-                <p className="better-ask">Better ask your Discord to pump your bags before buying {product.name}</p>
+                <p className="better-ask">Better ask your Discord to pump your bags before buying <strong>{product.name}</strong></p>
                 <button className="cancel-btn" onClick={() => setSelectedNft(null)}>Back</button> 
               </div>
             }
             { canPurchase != null && continueTapped && exchangeStatus == null &&
               <div className="first-step">
-                <h3 className="floor-price">Confirm Purchase</h3>
-                <p className="confirm-exchange">Click 'Confirm Exchange' in order to post your NFT as collateral to pay for {product.name} later.</p>
+                <h3 className="floor-price">Confirm</h3>
+                <p className="confirm-exchange">Click 'Confirm Exchange' in order to post your NFT as collateral to pay for <strong>{product.name}</strong> later.</p>
                 <p className="confirm-exchange-extra">This means you will have to pay</p>
                 <p><strong>{(product.price / 100) / ethPrice} WETH</strong><br />(${product.price / 100} USD)</p>
                 <p>within 30 days to get your NFT back.</p>
@@ -82,10 +83,9 @@ const CollateralBarterCheckout:React.FC<CollateralBarterCheckoutProps> = ({ sele
               canPurchase !== null && continueTapped && exchangeStatus && 
               <div className="first-step">
                 <h3 className="floor-price">Success!</h3>
-                <p className="confirm-exchange">You succesfully posted your <strong>{selectedNft.name}</strong> NFT as collateral for {product.name}! </p>
-                {/* <img alt={product.name} src={product.productImageUrls[0]} /> */}
+                <p className="confirm-exchange">You succesfully posted your <strong>{selectedNft.name}</strong> NFT as collateral for <strong>{product.name}</strong>!</p>
                 <a className="continue-shopping" href="/">Continue Shopping</a>
-                <p className="remember">Remember to pay in full within 30 days or risk loosing your {selectedNft.name} forever!</p>
+                <p className="remember">Remember to pay in full within 30 days or risk loosing your {selectedNft.name} NFT forever!</p>
                 <a className="make-payment" href="/payments">Make a Payment</a>
               </div>
             }

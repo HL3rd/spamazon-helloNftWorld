@@ -26,7 +26,7 @@ declare var window: any;
  * function will return success or failure if an instant purchase can take place
  * 
  */
-export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) => {
+export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any, isCollateral:boolean) => {
   
   console.log(`FINAL ETH PRICE AT PURCHASE CHECK : ${ethPrice}`);
 
@@ -40,6 +40,14 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any) =
   if (floorPriceUSD > prodPriceUSD) {
     // Execute transfer
     console.log(`Can execute the trade!`);
+    return {
+      success: true,
+      floorPriceETH,
+      floorPriceUSD,
+      status: `About to transfer dis NFT`
+    }
+  } else if (isCollateral &&  floorPriceUSD >= (prodPriceUSD * 0.5)) {
+    console.log(`Can execute the trade as collateral!`);
     return {
       success: true,
       floorPriceETH,

@@ -7,7 +7,7 @@ const Home = () => {
 
   return (
     <div>
-      <Navbar walletAddress={"a"} userBalance={"a"} title={"Shopping"} errorMessage={"a"} /> 
+      <Navbar walletAddress={""} userBalance={""} title={"Shopping"} errorMessage={""} /> 
       {/* walletAddress={walletAddress} userBalance={userBalance} errorMessage={errorMessage} /> */}
 
       <div className="home-content">
