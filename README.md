@@ -1,46 +1,38 @@
-# Getting Started with Create React App
+# Spamazon
+**Buy anything with anything**
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### Deployed Site: https://spamazon-nft.netlify.app/
+**Must use Rinkeby network and have > 0 WETH in wallet to user properly**
 
-## Available Scripts
+This project won the **Most Hilarious** category and **2nd overall** in the [OpenSea x Replit HelloNFTWorld Hackathon](https://dorahacks.io/hackathon/19/detail)
 
-In the project directory, you can run:
+[OpenSea Leaderboard](https://dorahacks.io/grant/opensea/top)
 
-### `npm start`
+[Project BUILD Link](https://dorahacks.io/buidl/2677)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Team
+[Horacio Lopez](https://github.com/HL3rd) - Full Stack
+[Matteo Cosentino](https://github.com/Matteocos40) - Solidity
+[Collin Haney](https://github.com/chaney13) - HTML & CSS
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Idea
 
-### `npm test`
+At the time of this project, there was a recent vacuum in the one-click checkout space so we though to ourselves, "Wouldn't it be funny if someone built a one-click checkout for web3? How funny would it be to barter your $300k BAYC NFT for a $3000 Macbook?"
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+We got to work and eventually created Spamazon, the home of Spamazon Checkout and a store where you can buy anything with anything.
 
-### `npm run build`
+## Functionality
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Instant Barter
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Checkout with **One-click Barter** and if your NFT collection's floor price is >= the price of the item, then you will instantly trade your NFT to the store.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**CAREFUL!!! YOU WILL NOT BE ABLE TO GET YOUR NFT BACK WITH THIS OPTION**
 
-### `npm run eject`
+### Collateralized Barter
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Checkout with **Dump now, pay later** and if your NFT collection's floor price is >= 50% of price of the item, then Barter.sol will hold your NFT as collateral until you pay back the full item price.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Repayment
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+Repayments can only be done in WETH. The intention behind this is to make it easier to allow payments with other ERC20 coins in the future.
