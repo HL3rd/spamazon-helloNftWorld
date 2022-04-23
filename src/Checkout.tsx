@@ -5,6 +5,7 @@ import { connectWallet } from './utils/interact';
 import { formatStripeToUSDString } from './utils/format';
 
 import { getNFTData, getETHPriceInUSD } from './queries/NftData';
+import { queryProductDoc } from './queries/FirebaseQueries';
 
 import { Product } from './constants/class-objects';
 
@@ -16,18 +17,9 @@ const Checkout:React.FC = () => {
 
   let { productId } = useParams();
 
-  const spamCostume:Product = {
-    description: 'A revolutionary new product: the spam costume. This amazing invention is guaranteed to make you the life of the party. So what are you waiting for?! Buy it!',
-    productImageUrls: ['https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fspam_apparel_p4%201.png?alt=media&token=88303656-b08d-41d6-af49-c241aee7ea22', 'https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fspam_costume.png?alt=media&token=70beb50b-9a28-42f2-bbfa-c7c2ecb1ed9e', 'https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fspam_apparel_p3%201.png?alt=media&token=447497ba-4dfb-44ee-b258-4d2faab0db74'],
-    id: 'jx7BZ9Ds5HyRiqOrw5cm',
-    isListed: true,
-    name: 'Spam Costume',
-    price: 10000,
-    quantity: 50,
-  };
-
   // Front end state vars
-  const [currentImage, setCurrentImage] = useState(spamCostume.productImageUrls[0]);
+  const [currentProduct, setCurrentProduct] = useState<Product|null>();
+  const [currentImage, setCurrentImage] = useState('');
   // Wallet state vars
   const [errorMessage, setErrorMessage] = useState('');
   const [walletAddress, setWalletAddress] = useState(null);
@@ -46,6 +38,7 @@ const Checkout:React.FC = () => {
     // Connect Wallet if needed
     const resp:any = await connectWallet();
     const addr = resp.address;
+    console.log(`BAMMM${addr}`);
     if (addr !== "") {
       accountChangedHandler(addr);
     } else {
@@ -60,7 +53,7 @@ const Checkout:React.FC = () => {
     setWalletAddress(newAccount);
     getUserBalance(newAccount);
 
-    if (!callingNfts) {
+    if (!callingNfts && newAccount) {
       const nftResp = await getNFTData(newAccount);
       setCallingNfts(false);
       setNfts(nftResp);
@@ -90,18 +83,28 @@ const Checkout:React.FC = () => {
     setETHPrice(price);
   };
 
-
   // Grabs the product id in the path name and calls the product
   const renderCurrentProduct = async () => {
+
     console.log(`PRODUCT ID: ${productId}`);
-    if (productId !== undefined) {
-      // Query product in Firestore
 
-      // If query returns nothing --> Home
-
-    } else {
-      // Home
+    if (productId == undefined) {
+      console.log(`Head home`);
+      return;
     }
+
+    const product = await queryProductDoc(productId);
+
+    // If query returns nothing --> Home
+    if (product == undefined) {
+      // TODO: enter the Home router
+      console.log(`HEAD HOME`);
+      return;
+    }
+
+    setCurrentProduct(product);
+    setCurrentImage(product.productImageUrls[0]);
+    
   };
 
   const imageClick = (clickedUrl:string) => {
@@ -117,10 +120,11 @@ const Checkout:React.FC = () => {
     <div>
       <Navbar walletAddress={walletAddress} userBalance={userBalance} title={"Checkout"} errorMessage={errorMessage} />
       <div className="sell-content">
-        <div className="sell-cols">
+      {currentProduct &&
+      <div className="sell-cols">
 
           <div className="far-left-col">
-            { spamCostume.productImageUrls.map((url:string, index:any) => {
+            { currentProduct.productImageUrls.map((url:string, index:any) => {
               return <img key={index} onClick={() => imageClick(url)} className="highlight-img" alt="preview-img" width="100px" height="100px" src={url} />
             })}
           </div>
@@ -130,18 +134,18 @@ const Checkout:React.FC = () => {
           </div>
 
           <div className="center-right-col">
-            <h2 className="product-name">{spamCostume.name}</h2>
-            <p className="product-price">{formatStripeToUSDString(spamCostume.price)}</p>
-            <p className="product-description">{spamCostume.description}</p>
+            <h2 className="product-name">{currentProduct.name}</h2>
+            <p className="product-price">{formatStripeToUSDString(currentProduct.price)}</p>
+            <p className="product-description">{currentProduct.description}</p>
           </div>
 
           <div className="far-right-col">
-            <p style={{ textAlign: 'left' }}>{formatStripeToUSDString(spamCostume.price)}</p>
+            <p style={{ textAlign: 'left' }}>{formatStripeToUSDString(currentProduct.price)}</p>
             <p style={{ textAlign: 'left' }}>FREE delivery to<strong> the Metaverse.</strong></p>
             <button disabled={ethPrice == null} onClick={() => checkoutClicked(true)} className="buy-btn">One-click barter</button>
             <button disabled={ethPrice == null} onClick={() => checkoutClicked(false)} className="sell-btn">Dump now, pay later</button>
           </div>
-        </div>
+        </div>}
       {nftsVisible &&
         <div id="overlay">
           <NFTContainer
@@ -151,11 +155,11 @@ const Checkout:React.FC = () => {
             setSelectedNft={setSelectedNft}
           />
         </div>}
-        {selectedNft &&
+        {selectedNft && currentProduct &&
         <div id="purchaseOverlay">
           <PurchaseModal
             selectedNft={selectedNft}
-            product={spamCostume}
+            product={currentProduct}
             ethPrice={ethPrice}
             isInstantBarter={isInstantBarter}
             setSelectedNft={setSelectedNft}

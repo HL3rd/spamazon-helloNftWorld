@@ -27,7 +27,7 @@ export const getNFTData = async (address:any) => {
     method: 'GET',
   };
   
-  const response = await fetch(`https://rinkeby-api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=0`, options);
+  const response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=0&limit=20`, options);
   const data = await response.json();
 
   if (data === undefined || data === null) {

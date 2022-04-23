@@ -30,7 +30,7 @@ const Navbar:React.FC<NavbarProps> = ({ walletAddress, userBalance, title, error
           </div>
         </a>
 
-        <a href="/checkout">
+        <a href="/checkout/jx7BZ9Ds5HyRiqOrw5cm">
           <div>
             <h2 className="checkout">Checkout</h2>
           </div>

@@ -25,7 +25,7 @@ const PurchaseModal:React.FC<PurchaseModalProps> = ({ selectedNft, product, ethP
           </div>
           { isInstantBarter &&
             <div className="checkout-left-col">
-              <h3 className="trade-in">Instant Trade-In Purchase</h3>
+              <h3 className="trade-in">Instant Barter Purchase</h3>
               <img alt={`${selectedNft.name}`} className="nft-barter-img" src={selectedNft.image_url}/>
             </div>
           }

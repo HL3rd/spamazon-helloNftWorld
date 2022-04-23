@@ -27,7 +27,7 @@ const ProductPayments: React.FC = () => {
   const [currentOustandingBalance, setCurrentOutstandingBalance] = useState<OutstandingNftBalance|null>();
 
   // payment
-  const [paymentAmount, setPaymentAmount] = useState<number|undefined>(undefined);
+  const [paymentAmount, setPaymentAmount] = useState(0);
   const [isPayingFull, setIsPayingFull] = useState(false);
 
   // First function called in useEffect
@@ -82,9 +82,10 @@ const ProductPayments: React.FC = () => {
       });
   }
 
-  const setCurrentBalanceObj = async (currentBalanceObj:OutstandingNftBalance) => {
+  const selectedCurrentBalanceObj = async (currentBalanceObj:OutstandingNftBalance) => {
 
     setCurrentOutstandingBalance(currentBalanceObj);
+    setPaymentAmount(0);
 
     db.collection('outstandingNftBalance')
       .doc(currentBalanceObj.id)
@@ -93,7 +94,7 @@ const ProductPayments: React.FC = () => {
         setCurrentOutstandingBalance(newObj);
 
         if (newObj.balanceRemaining == 0) {
-          setPaymentAmount(undefined);
+          setPaymentAmount(0);
         }
 
       });
@@ -182,8 +183,8 @@ const ProductPayments: React.FC = () => {
     if (!repayResp.success) {
       setErrorMessage(repayResp.status);
     } else {
-      setPaymentAmount(undefined);
-      setErrorMessage(repayResp.status);
+      setPaymentAmount(0);
+      setErrorMessage(`Success! ${repayResp.status}`);
     }
 
   }
@@ -228,7 +229,7 @@ const ProductPayments: React.FC = () => {
               <div className="outstanding-items">
                 { oustandingBalancesArr.map((balanceObj:OutstandingNftBalance, index:any) => {
                   return (
-                    <a key={index} onClick={() => { setCurrentBalanceObj(balanceObj) }} className="balance-box-link">
+                    <a key={index} onClick={() => { selectedCurrentBalanceObj(balanceObj) }} className="balance-box-link">
                       <div className="balance-box">
                         <img className="balance-img" src={balanceObj.product.productImageUrls[0]} />
                         <div className="balance-info">
@@ -244,7 +245,7 @@ const ProductPayments: React.FC = () => {
             </Row>
           </Col>
 
-          <Col xs={12} md={6} className="pay-right-col">
+          <Col xs={12} md={9} className="pay-right-col">
             { oustandingBalancesArr.length <= 0 &&
               <h3 className="h3-subtitle">Looks like you have no oustanding balances!</h3>
             }
@@ -252,34 +253,42 @@ const ProductPayments: React.FC = () => {
               <h3 className="h3-subtitle">Select an outstanding balance to begin paying it off!</h3>
             }
             { currentOustandingBalance &&
-              <div className="selected-box">
-                <div className="selected-img-div">
-                  <img className="selected-img" alt={currentOustandingBalance.id} src={currentOustandingBalance.product.productImageUrls[0]} />
-                </div>
-                <div className="selected-info-div">
-                  <h3 className="selected-title">{currentOustandingBalance.product.name}</h3>
-                  <p className="selected-subtitle">Remaining Balance: {currentOustandingBalance.balanceRemaining} WETH</p>
-                  <p className="selected-subtitle-usd">{formatETHToUSDString(currentOustandingBalance.balanceRemaining, ethPrice)}</p>
-                  <div className="progressBar">
-                    <ProgressBar
-                      now={ getOutstandingBalanacePaidPercent() }
-                    />
+              <div className="selected-balance-div">
+                <div className="selected-box">
+                  <div className="selected-img-div">
+                    <img className="selected-img" alt={currentOustandingBalance.id} src={currentOustandingBalance.product.productImageUrls[0]} />
                   </div>
-                  <form className="form-input" onSubmit={(e:any) => payOutstandingBalance(e)}>
-                    <p className="selected-amount-input">Amount to Pay:</p>
-                    <input
-                      type="number"
-                      onChange={(event) => enteringPaymentAmount(event)}
-                      step="0.000001"
-                      value={paymentAmount}
-                    />
-                    <p>{ formatETHToUSDString((paymentAmount ? paymentAmount : 0), ethPrice) }</p>
-                    <div className="pay-btns-div">
-                      <button className="pay-btn">Pay</button>
-                      <a className="pay-full-btn" onClick={() => enterRemainginBalance()}>Pay full balance</a>
+                  <div className="selected-info-div">
+                    <h3 className="selected-title">{currentOustandingBalance.product.name}</h3>
+                    <p className="selected-subtitle">Remaining Balance: {currentOustandingBalance.balanceRemaining} WETH</p>
+                    <p className="selected-subtitle-usd">{formatETHToUSDString(currentOustandingBalance.balanceRemaining, ethPrice)}</p>
+                    <div className="progressBar">
+                      <ProgressBar
+                        now={ getOutstandingBalanacePaidPercent() }
+                      />
                     </div>
-                  </form>
-                  { errorMessage && <p>{ errorMessage }</p> }
+                    <form className="form-input" onSubmit={(e:any) => payOutstandingBalance(e)}>
+                      <p className="selected-amount-input">Amount to Pay:</p>
+                      <input
+                        type="number"
+                        onChange={(event) => enteringPaymentAmount(event)}
+                        step="0.000001"
+                        value={paymentAmount}
+                      />
+                      <p>{ formatETHToUSDString((paymentAmount ? paymentAmount : 0), ethPrice) }</p>
+                      <div className="pay-btns-div">
+                        <button className="pay-btn">Pay</button>
+                        <a className="pay-full-btn" onClick={() => enterRemainginBalance()}>Pay full balance</a>
+                      </div>
+                    </form>
+                    { errorMessage && <p className="error-p">{ errorMessage }</p> }
+                  </div>
+                </div>
+                <div className="nft-hold-div">
+                  <p>On Hold</p>
+                  <img alt="nft" className="nft-hold-img" src={currentOustandingBalance.nftImageUrl} />
+                  <p className="nft-hold-p">{currentOustandingBalance.nftContractAddress}</p>
+                  <p className="nft-hold-p">Token ID: {currentOustandingBalance.nftTokenId}</p>
                 </div>
               </div>
             }

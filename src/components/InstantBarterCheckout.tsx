@@ -3,6 +3,7 @@ import { Row, Col } from 'react-bootstrap';
 import { Product } from '../constants/class-objects';
 
 import { canPurchaseCheck, instantBarterNFT } from '../utils/productInteractions';
+import { formatStripeToUSDString } from '../utils/format';
 
 interface InstantBarterCheckoutProps {
   selectedNft: any,
@@ -23,7 +24,7 @@ const InstantBarterCheckout:React.FC<InstantBarterCheckoutProps> = ({ selectedNf
   const checkMarketValue = async () => {
 
     setCheckingMarketValue(true);
-    const checkResp = await canPurchaseCheck(selectedNft, product, ethPrice);
+    const checkResp = await canPurchaseCheck(selectedNft, product, ethPrice, false);
     setCheckingMarketValue(false);
 
     setCanPurchase(checkResp.floorPriceUSD > (product.price / 100));
@@ -46,7 +47,7 @@ const InstantBarterCheckout:React.FC<InstantBarterCheckoutProps> = ({ selectedNf
           <Col>
             { canPurchase == null &&
             <div className="first-step">
-              <p className="auto-trade">Automatically trade your {selectedNft.name} NFT for {product.name} if the current market value is higher!</p>
+              <p className="auto-trade">Automatically trade your <strong>{selectedNft.name}</strong> NFT for <strong>{product.name}</strong> if the current market value is higher than <strong>{formatStripeToUSDString(product.price)}</strong></p>
               <button className="market-btn" disabled={checkingMarketValue} onClick={() => checkMarketValue()}>Check Market Value</button>
             </div>
             }

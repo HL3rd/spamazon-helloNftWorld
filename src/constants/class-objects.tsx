@@ -58,14 +58,24 @@ export type EndedNftBalance = {
   sellerAddress: Scalars['String'];
 };
 
-export type Product = {
-  description: Scalars['String'];
-  productImageUrls: Array<Scalars['String']>;
-  id: Scalars['String'];
-  isListed: Scalars['Boolean'];
-  name: Scalars['String'];
-  price: Scalars['Int'];
-  quantity: Scalars['Int'];
+export class Product {
+  public description: Scalars['String'];
+  public id: Scalars['String'];
+  public isListed: Scalars['Boolean'];
+  public name: Scalars['String'];
+  public price: Scalars['Int'];
+  public productImageUrls: Array<Scalars['String']>;
+  public quantity: Scalars['Int'];
+
+  constructor(id:string, data:any) {
+    this.description = (data.description ? data.description : '');
+    this.id = id;
+    this.isListed = (data.isListed ? data.isListed : true);
+    this.name = (data.name ? data.name : '');
+    this.price = (data.price ? data.price : 0);
+    this.productImageUrls = (data.productImageUrls ? data.productImageUrls : ['https://firebasestorage.googleapis.com/v0/b/sp-hellonftworld.appspot.com/o/publicProductImages%2Fspam_costume.png?alt=media&token=70beb50b-9a28-42f2-bbfa-c7c2ecb1ed9e']);
+    this.quantity = (data.quantity ? data.quantity : 0);
+  }
 };
 
 export type ProductOrder = {

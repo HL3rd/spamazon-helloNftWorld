@@ -1,8 +1,24 @@
 import { db, FieldValue } from '../utils/firebase';
 import { OutstandingNftBalance, Product } from '../constants/class-objects';
 import { getCurrentTimestamp } from '../utils/format';
+import { dblClick } from '@testing-library/user-event/dist/click';
 
 const STORE_WALLET_ADDRESS = "0x2929C3c9805dD1A16546251b9b0B65583FD302c8"
+
+/**
+ * 
+ * @param productId 
+ */
+export const queryProductDoc = async (productId:string) => {
+  try {
+    const resp = await db.collection('product').doc(productId).get();
+    return new Product(resp.id, resp.data());
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
+}
+
 
 /**
  * 
