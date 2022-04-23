@@ -46,7 +46,7 @@ export const canPurchaseCheck = async (nft:any, product:Product, ethPrice:any, i
       floorPriceUSD,
       status: `About to transfer dis NFT`
     }
-  } else if (isCollateral &&  floorPriceUSD >= (prodPriceUSD * 0.5)) {
+  } else if (isCollateral && floorPriceUSD >= (prodPriceUSD * 0.5)) {
     console.log(`Can execute the trade as collateral!`);
     return {
       success: true,

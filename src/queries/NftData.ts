@@ -21,7 +21,7 @@ export const getNFTData = async (address:any) => {
   // TODO: Use this for production/mainnet API
   // const options = {
   //   method: 'GET',
-  //   headers: {Accept: 'application/json', 'X-API-KEY': '6fe67d619aed41f186995586f8ace25e'},
+  //   headers: {Accept: 'application/json', 'X-API-KEY': ''},
   // };
   const options = {
     method: 'GET',
